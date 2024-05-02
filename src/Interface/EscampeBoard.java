@@ -1,3 +1,5 @@
+package Interface;
+
 public class EscampeBoard implements Partie1
 {
     @Override
