@@ -3,33 +3,36 @@ package Engine;
 import java.util.BitSet;
 import java.util.List;
 
-public class Board implements IBitBoard
+public class Board implements IBoard
 {
     // region Properties
-    protected long _bitBoard;
-    protected long _bitCells;
+    // Board representing the lines of the board, by pawns (IsWhite, IsUnicorn, IsOccupied)
+    protected int[] _bitBoard;
+    // Board representing the cells of the board by type (simple, double, triple, error)
+    protected short[] _bitCells;
     // endregion
 
     // region Constructors
     public Board(int width, int height)
     {
-        _bitBoard = new BitSet(width * height);
+        _bitBoard = new int[width * height];
+        _bitCells = new short[width * height];
     }
     // endregion
 
     // region Methods
     @Override
-    public List<IBitPawn> getPawns() {
+    public List<IPawn> getPawns() {
         return List.of();
     }
 
     @Override
-    public List<IBitPawn> getPawns(boolean playerColor) {
+    public List<IPawn> getPawns(boolean playerColor) {
         return List.of();
     }
 
     @Override
-    public IBitBoard initFromString(String s) {
+    public IBoard initFromString(String s) {
         //Iterate over each character in the string representation.
         //Determine the corresponding bit positions based on the piece type, player color, and whether the cell is occupied or not.
         //Set the corresponding bits in the bitboard.
