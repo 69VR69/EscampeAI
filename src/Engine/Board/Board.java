@@ -1,5 +1,6 @@
 package Engine.Board;
 
+import Engine.Heuristics.HeuristicPipeline;
 import Engine.Utils;
 
 public class Board implements IBoard
@@ -9,18 +10,21 @@ public class Board implements IBoard
     protected int[] _bitBoard;
     // Board representing the cells of the board by type (simple, double, triple, error)
     protected short[] _bitCells;
+    private final HeuristicPipeline _heuristicPipeline;
     // endregion
 
     // region Constructors
-    public Board(int width, int height)
+    public Board(int width, int height, HeuristicPipeline heuristicPipeline)
     {
         _bitBoard = new int[width * height];
         _bitCells = new short[width * height];
+        _heuristicPipeline = heuristicPipeline;
     }
     public Board(Board board)
     {
         _bitBoard = board._bitBoard.clone();
         _bitCells = board._bitCells.clone();
+        _heuristicPipeline = board._heuristicPipeline;
     }
     // endregion
 
@@ -52,7 +56,7 @@ public class Board implements IBoard
 
     @Override
     public int evaluate() {
-        return 0;
+        return _heuristicPipeline.evaluate(this);
     }
 
     @Override
