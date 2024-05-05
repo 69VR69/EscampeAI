@@ -26,15 +26,43 @@ public interface IBoard {
 
     /**
      * Clone the board
+     *
      * @return the cloned board
      */
     IBoard Clone();
 
-    void evaluate();
+    /**
+     * Evaluate the board
+     *
+     * @return the evaluation of the board
+     */
+    int evaluate();
 
+    /**
+     * Check if the game is over
+     *
+     * @return true if the game is over, false otherwise
+     */
     boolean isGameOver();
 
-    void applyMove(IMove move);
+    /**
+     * Apply a move to the board
+     *
+     * @param move         the move to apply
+     * @param bypassChecks true if the move should be applied without checks, false otherwise
+     */
+    void applyMove(IMove move, boolean bypassChecks);
 
+    /**
+     * Apply a move to the board with legal checks
+     * @param move the move to apply
+     */
+    void applyMoveWithChecks(IMove move);
+
+    /**
+     * Undo a move from the board
+     *
+     * @param move the move to undo
+     */
     void undoMove(IMove move);
 }

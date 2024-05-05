@@ -30,8 +30,28 @@ public class AlphaBetaAlgorithm {
         int beta = Integer.MAX_VALUE;
         IBoard tempBoard = board.Clone();
 
-        // Call the alphaBeta method
-        bestMove = alphaBeta(tempBoard, maxDepth, alpha, beta, isWhite);
+        // Get the possible moves
+        EvaluatedMove[] moves = (EvaluatedMove[]) tempBoard.getPossibleMoves(isWhite);
+
+        // Iterate over the possible moves
+        for (EvaluatedMove move : moves) {
+            // Apply the move
+            tempBoard.applyMoveWithChecks(move);
+
+            // Call the alphaBeta method recursively
+            int value = alphaBeta(tempBoard, maxDepth, alpha, beta, false);
+
+            // Undo the move
+            tempBoard.undoMove(move);
+
+            // If the value is greater than the alpha value
+            if (value > alpha) {
+                // Update the alpha value
+                alpha = value;
+                // Update the best move
+                bestMove = move;
+            }
+        }
 
         // Return the best move
         return bestMove;
@@ -45,81 +65,75 @@ public class AlphaBetaAlgorithm {
      * @param alpha              the alpha value
      * @param beta               the beta value
      * @param isMaximizingPlayer true if the current player is maximizing, false otherwise
-     * @return the best move
+     * @return the value of the best move
      */
-    protected EvaluatedMove alphaBeta(IBoard board, int depth, int alpha, int beta, boolean isMaximizingPlayer) {
+    protected int alphaBeta(IBoard board, int depth, int alpha, int beta, boolean isMaximizingPlayer) {
         // Security check
         if (board == null)
-            return NothingMove;
+            return 0;
 
         // If the depth is 0 or if the game is over, return the evaluation of the board
         if (depth == 0 || board.isGameOver())
-            board.evaluate();
+            return board.evaluate();
 
         // Initialize the variables
-        EvaluatedMove bestMove = NothingMove;
         EvaluatedMove[] moves = (EvaluatedMove[]) board.getPossibleMoves(isMaximizingPlayer);
 
         // If there are no possible moves, return the current best move
         if (moves.length == 0)
-            return bestMove;
+            return board.evaluate();
 
         // If the current player is maximizing
-        if (isMaximizingPlayer) {
-            bestMove.setScore(Integer.MIN_VALUE);
-            bestMove = CheckNestedMoves(board, bestMove, depth - 1, alpha, beta, moves, false);
-        } else {
-            bestMove.setScore(Integer.MAX_VALUE);
-            bestMove = CheckNestedMoves(board, bestMove, depth - 1, alpha, beta, moves, true);
-        }
 
         // Return the best move
-        return bestMove;
+        return isMaximizingPlayer ?
+                CheckNestedMoves(board, depth - 1, alpha, beta, moves, false) :
+                CheckNestedMoves(board, depth - 1, alpha, beta, moves, true);
     }
 
     /**
      * Check the nested moves
      *
      * @param board              the current board
-     * @param bestMove           the best move
      * @param depth              the depth of the search
      * @param alpha              the alpha value
      * @param beta               the beta value
      * @param moves              the possible moves
      * @param isMaximizingPlayer true if the current player is maximizing, false otherwise
-     * @return the best move
+     * @return the value of the best move
      */
-    private EvaluatedMove CheckNestedMoves(IBoard board, EvaluatedMove bestMove, int depth, int alpha, int beta, EvaluatedMove[] moves, boolean isMaximizingPlayer) {
+    private int CheckNestedMoves(IBoard board, int depth, int alpha, int beta, EvaluatedMove[] moves, boolean isMaximizingPlayer) {
+        int value = isMaximizingPlayer ? Integer.MIN_VALUE : Integer.MAX_VALUE;
+
         // Iterate over the possible moves
         for (EvaluatedMove move : moves) {
 
             // Apply the move
-            board.applyMove(move);
+            board.applyMoveWithChecks(move);
 
             // Call the alphaBeta method recursively
-            EvaluatedMove currentMove = alphaBeta(board, depth, alpha, beta, isMaximizingPlayer);
+            int nestedValue = alphaBeta(board, depth, alpha, beta, !isMaximizingPlayer);
 
             // Undo the move
             board.undoMove(move);
 
+            // If the current player is maximizing
             if (isMaximizingPlayer) {
-                // Max between the current move and the best move
-                if (currentMove.getScore() > bestMove.getScore()) {
-                    bestMove = currentMove;
-                    alpha = currentMove.getScore();
-                }
+                // Maximize the value
+                value = Math.max(value, nestedValue);
+                // Update the alpha value
+                alpha = Math.max(alpha, value);
             } else {
-                // Min between the current move and the best move
-                if (currentMove.getScore() < bestMove.getScore()) {
-                    bestMove = currentMove;
-                    beta = currentMove.getScore();
-                }
+                // Minimize the value
+                value = Math.min(value, nestedValue);
+                // Update the beta value
+                beta = Math.min(beta, value);
             }
 
             // If the beta value is less than or equal to the alpha value
             if (beta <= alpha)
                 break;
         }
-        return bestMove;
+        return value;
     }
 }

@@ -1,5 +1,7 @@
 package Engine.Board;
 
+import Engine.Utils;
+
 public class Board implements IBoard
 {
     // region Properties
@@ -14,6 +16,11 @@ public class Board implements IBoard
     {
         _bitBoard = new int[width * height];
         _bitCells = new short[width * height];
+    }
+    public Board(Board board)
+    {
+        _bitBoard = board._bitBoard.clone();
+        _bitCells = board._bitCells.clone();
     }
     // endregion
 
@@ -36,6 +43,37 @@ public class Board implements IBoard
     @Override
     public IMove[] getPossibleMoves(boolean isWhite) {
         return new IMove[0];
+    }
+
+    @Override
+    public IBoard Clone() {
+        return new Board(this);
+    }
+
+    @Override
+    public int evaluate() {
+        return 0;
+    }
+
+    @Override
+    public boolean isGameOver() {
+        return false;
+    }
+
+    @Override
+    public void applyMove(IMove move, boolean bypassChecks) {
+        //Apply the move to the board.
+
+    }
+
+    @Override
+    public void applyMoveWithChecks(IMove move) {
+        applyMove(move, false);
+    }
+
+    @Override
+    public void undoMove(IMove move) {
+        applyMove(Utils.GetInverseMove(move), true);
     }
     // endregion
 }

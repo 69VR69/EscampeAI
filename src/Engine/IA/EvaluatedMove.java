@@ -8,7 +8,7 @@ public class EvaluatedMove extends Move
 
     public EvaluatedMove(Move move, int score)
     {
-        super();
+        super(move);
         this.score = score;
     }
 
