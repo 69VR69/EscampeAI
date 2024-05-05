@@ -1,7 +1,4 @@
-package Engine;
-
-import java.util.BitSet;
-import java.util.List;
+package Engine.Board;
 
 public class Board implements IBoard
 {
@@ -22,21 +19,10 @@ public class Board implements IBoard
 
     // region Methods
     @Override
-    public List<IPawn> getPawns() {
-        return List.of();
-    }
-
-    @Override
-    public List<IPawn> getPawns(boolean playerColor) {
-        return List.of();
-    }
-
-    @Override
-    public IBoard initFromString(String s) {
-        //Iterate over each character in the string representation.
+    public void setPawnsOnBoard(IPawn[] pawns) {
+        //Iterate over each pawn in the list.
         //Determine the corresponding bit positions based on the piece type, player color, and whether the cell is occupied or not.
         //Set the corresponding bits in the bitboard.
-        return null;
     }
 
     @Override
@@ -45,6 +31,11 @@ public class Board implements IBoard
         //Determine the piece type (paladin or licorne) and player color based on the bit positions.
         //Construct the string representation accordingly.
         return null;
+    }
+
+    @Override
+    public IMove[] getPossibleMoves(boolean isWhite) {
+        return new IMove[0];
     }
     // endregion
 }
