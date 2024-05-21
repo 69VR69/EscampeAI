@@ -11,9 +11,8 @@ public class Board implements IBoard
     // Board representing the cells of the board by type (simple, double, triple, error)
     protected short[] _bitCells;
     private final HeuristicPipeline _heuristicPipeline;
-
-    private Move _lastMove = Utils.NothingMove();
-    private Move _lastEnnemyMove = Utils.NothingMove();
+    // Last move made by the enemy
+    private Move _lastEnemyMove = Utils.NothingMove();
     // endregion
 
     // region Constructors
@@ -85,17 +84,11 @@ public class Board implements IBoard
     // endregion
 
     // region Getters & Setters
-    public Move getLastMove() {
-        return _lastMove;
+    public Move getLastEnemyMove() {
+        return _lastEnemyMove;
     }
-    public void setLastMove(Move lastMove) {
-        _lastMove = lastMove;
-    }
-    public Move getLastEnnemyMove() {
-        return _lastEnnemyMove;
-    }
-    public void setLastEnnemyMove(Move lastEnnemyMove) {
-        _lastEnnemyMove = lastEnnemyMove;
+    public void setLastEnemyMove(Move lastEnnemyMove) {
+        _lastEnemyMove = lastEnnemyMove;
     }
     // endregion
 }
