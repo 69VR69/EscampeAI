@@ -11,6 +11,9 @@ public class Board implements IBoard
     // Board representing the cells of the board by type (simple, double, triple, error)
     protected short[] _bitCells;
     private final HeuristicPipeline _heuristicPipeline;
+
+    private Move _lastMove = Utils.NothingMove();
+    private Move _lastEnnemyMove = Utils.NothingMove();
     // endregion
 
     // region Constructors
@@ -78,6 +81,21 @@ public class Board implements IBoard
     @Override
     public void undoMove(IMove move) {
         applyMove(Utils.GetInverseMove(move), true);
+    }
+    // endregion
+
+    // region Getters & Setters
+    public Move getLastMove() {
+        return _lastMove;
+    }
+    public void setLastMove(Move lastMove) {
+        _lastMove = lastMove;
+    }
+    public Move getLastEnnemyMove() {
+        return _lastEnnemyMove;
+    }
+    public void setLastEnnemyMove(Move lastEnnemyMove) {
+        _lastEnnemyMove = lastEnnemyMove;
     }
     // endregion
 }
