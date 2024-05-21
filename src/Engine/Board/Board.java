@@ -49,7 +49,10 @@ public class Board implements IBoard
 
     @Override
     public IMove[] getPossibleMoves(boolean isWhite) {
-        return new IMove[0];
+        IMove[] moves = new IMove[0];
+
+        //Iterate over each bit in the bitboard.
+        //Determine get the
     }
 
     @Override
@@ -73,6 +76,7 @@ public class Board implements IBoard
         if(bypassChecks || IsMoveValid(move))
         {
             //Apply the move to the board.
+
         }
     }
 
