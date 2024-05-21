@@ -72,7 +72,9 @@ public class Board implements IBoard
         //Apply the move to the board.
         if(bypassChecks || IsMoveValid(move))
         {
-            //Apply the move to the board.
+            int tmp = this._bitBoard[move.getEndPosition()];
+    		this._bitBoard[move.getEndPosition()] = this._bitBoard[move.getStartPosition()];
+    		this._bitBoard[move.getStartPosition()] = tmp;
         }
     }
 
