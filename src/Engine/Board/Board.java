@@ -12,7 +12,7 @@ public class Board implements IBoard
     protected short[] _bitCells;
     private final HeuristicPipeline _heuristicPipeline;
     // Last move made by the enemy
-    private Move _lastEnemyMove = Utils.NothingMove();
+    private IMove _lastEnemyMove = Utils.NothingMove();
     // endregion
 
     // region Constructors
@@ -27,6 +27,7 @@ public class Board implements IBoard
         _bitBoard = board._bitBoard.clone();
         _bitCells = board._bitCells.clone();
         _heuristicPipeline = board._heuristicPipeline;
+        _lastEnemyMove = board._lastEnemyMove;
     }
     // endregion
 
@@ -69,7 +70,10 @@ public class Board implements IBoard
     @Override
     public void applyMove(IMove move, boolean bypassChecks) {
         //Apply the move to the board.
-
+        if(bypassChecks || IsMoveValid(move))
+        {
+            //Apply the move to the board.
+        }
     }
 
     @Override
@@ -81,13 +85,19 @@ public class Board implements IBoard
     public void undoMove(IMove move) {
         applyMove(Utils.GetInverseMove(move), true);
     }
+
+    private boolean IsMoveValid(IMove move) {
+        //Check if the move is valid.
+        return false;
+    }
+
     // endregion
 
     // region Getters & Setters
-    public Move getLastEnemyMove() {
+    public IMove getLastEnemyMove() {
         return _lastEnemyMove;
     }
-    public void setLastEnemyMove(Move lastEnnemyMove) {
+    public void setLastEnemyMove(IMove lastEnnemyMove) {
         _lastEnemyMove = lastEnnemyMove;
     }
     // endregion
