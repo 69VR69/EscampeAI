@@ -18,5 +18,20 @@ public interface IPawn
      * @return true if the cell is occupied, false otherwise
      */
     boolean getIsOccupied();
+    /**
+     * Get the cell's line number
+     * @return int
+     */
+    int getLineNumber();
+    /**
+     * Get the cell's column number
+     * @return int
+     */
+    int getColumnNumber();
+    /**
+     * Get a line with just this pawn
+     * @return int Binary representation of the line
+     */
+    int getLine();
     // endregion
 }

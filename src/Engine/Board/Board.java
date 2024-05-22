@@ -71,6 +71,16 @@ public class Board implements IBoard
         //Iterate over each pawn in the list.
         //Determine the corresponding bit positions based on the piece type, player color, and whether the cell is occupied or not.
         //Set the corresponding bits in the bitboard.
+    	
+    	// Init to blank
+    	for (int i = 0; i<this._bitBoard.length; i++) {
+    		this._bitBoard[i] = 0;
+		} 
+    	
+    	// Place pawns
+        for (IPawn pawn : pawns) {          
+            this._bitBoard[pawn.getLineNumber()] |= pawn.getLine();
+        }
     }
 
     @Override
