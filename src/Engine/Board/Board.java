@@ -7,11 +7,11 @@ public class Board implements IBoard
 {
     // region Constants
     protected static final int PAWN_SIZE = 4;
-    protected static final int EMPTY_CELL = 0b0000;
-    protected static final int BLACK_PALADIN_CELL = 0b0001;
-    protected static final int BLACK_UNICORN_CELL = 0b0011;
-    protected static final int WHITE_PALADIN_CELL = 0b0101;
-    protected static final int WHITE_UNICORN_CELL = 0b0111;
+    protected static final int EMPTY_CELL = 0x0;
+    protected static final int BLACK_PALADIN_CELL = 0x1;
+    protected static final int BLACK_UNICORN_CELL = 0x3;
+    protected static final int WHITE_PALADIN_CELL = 0x5;
+    protected static final int WHITE_UNICORN_CELL = 0x7;
     // endregion
 
 
