@@ -49,4 +49,24 @@ public class Utils
     {
         return Integer.parseInt(value, 16);
     }
+
+    /**
+     * Convert a int into a binary string
+     * @value the int to convert
+     * @return the binary string
+     */
+    public static String IntToBinary(int value)
+    {
+        return Integer.toBinaryString(value);
+    }
+
+    /**
+     * Convert a binary string into an int
+     * @value the binary string to convert
+     * @return the int
+     */
+    public static int BinaryToInt(String value)
+    {
+        return Integer.parseInt(value, 2);
+    }
 }

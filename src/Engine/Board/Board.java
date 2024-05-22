@@ -3,6 +3,8 @@ package Engine.Board;
 import Engine.Heuristics.HeuristicPipeline;
 import Engine.Utils;
 
+import java.util.ArrayList;
+
 public class Board implements IBoard
 {
     // region Constants
@@ -14,7 +16,6 @@ public class Board implements IBoard
     protected static final int WHITE_UNICORN_CELL = 0x7;
     // endregion
 
-
     // region Properties
     // Board representing the lines of the board, each line contains 6 pawns represented as 3 bits (IsWhite, IsUnicorn, IsOccupied)
     protected int[] _bitBoard;
@@ -23,13 +24,13 @@ public class Board implements IBoard
     private final HeuristicPipeline _heuristicPipeline;
     // Last move made by the enemy
     private IMove _lastEnemyMove = Utils.NothingMove();
-    private int _boardSize = 6;
+    private int _boardLineSize = 6;
     // endregion
 
     // region Constructors
     public Board(int size, HeuristicPipeline heuristicPipeline)
     {
-        _boardSize = size;
+        _boardLineSize = size;
         _bitBoard = new int[size];
         _bitCells = new short[size];
         _heuristicPipeline = heuristicPipeline;
@@ -42,7 +43,7 @@ public class Board implements IBoard
 
     public Board(Board board)
     {
-        _boardSize = board._boardSize;
+        _boardLineSize = board._boardLineSize;
         _bitBoard = board._bitBoard.clone();
         _bitCells = board._bitCells.clone();
         _heuristicPipeline = board._heuristicPipeline;
@@ -93,24 +94,61 @@ public class Board implements IBoard
 
     @Override
     public IMove[] getPossibleMoves(boolean isWhite) {
-        IMove[] moves = new IMove[0];
+        ArrayList<IMove> moves = new ArrayList<>();
+
+        int unicorn = isWhite ? WHITE_UNICORN_CELL : BLACK_UNICORN_CELL;
+        int paladin = isWhite ? WHITE_PALADIN_CELL : BLACK_PALADIN_CELL;
 
         //Iterate over each bit in the bitboard.
-        for (int i = 0; i < _bitBoard.length; i++) {
-            int line = _bitBoard[i];
+        for (int lineNumber = 0; lineNumber < _bitBoard.length; lineNumber++) {
+            int line = _bitBoard[lineNumber];
 
             // If the line is empty, skip it
             if (line == 0) continue;
 
             // If the line does not contain a pawn of the current player, skip it
-            if ((isWhite && (line & 0b0100) == 0) || (!isWhite && (line & 0b0100) != 0)) continue;
+            if (!containsSpecificPiece(line, unicorn) && !containsSpecificPiece(line, paladin)) continue;
 
-            // Extract each pawn from the line
-                //TODO : IN PROGRESS
+            // Iterate of each pawns in the line
+            for (int columnNumber = 0; columnNumber < _boardLineSize; columnNumber++) {
+                // Extract the PAWN_SIZE bits from the line
+                int bits = (line >> (columnNumber * PAWN_SIZE)) & 0x7;
+                Pawn pawn = new Pawn(bits, lineNumber, columnNumber);
+                if(!pawn.__isOccupied) continue;
 
+                System.out.println("Line " + lineNumber);
+                System.out.println("Bits : " + Utils.IntToBinary(bits) + " -> " + Utils.IntToBinary(line) + " >> " + (columnNumber * PAWN_SIZE) + " & " + Utils.IntToBinary(0x7));
+                System.out.println("Pawn : " + pawn);
+            }
         }
 
-        return moves;
+        return moves.toArray(new IMove[0]);
+    }
+
+    private boolean containsSpecificPiece(int line, int piece) {
+        // The mask consist of 6 times the piece value, for example if the piece is a paladin, the mask will be 0x111111
+        int mask = piece * 0x111111;
+        return  containsMask(line, mask);
+    }
+    private boolean containsMask(int line, int mask) {
+        // The mask consist of 6 times the piece value, for example if the piece is a paladin, the mask will be 0x111111
+        return (line & mask) != 0;
+    }
+
+    private boolean containsWhitePaladin(int line) {
+        return (line & 0x555555) != 0;
+    }
+
+    private boolean containsWhiteUnicorn(int line) {
+        return (line & 0x777777) != 0;
+    }
+
+    private boolean containsBlackPaladin(int line) {
+        return (line & 0x1111111) != 0;
+    }
+
+    private boolean containsBlackUnicorn(int line) {
+        return (line & 0x3333333) != 0;
     }
 
     @Override
@@ -177,8 +215,8 @@ public class Board implements IBoard
 
             // If the line is not boardSize, add the missing 0 at the beginning
             String hexLine = Utils.IntToHex(line);
-            if(hexLine.length() < _boardSize)
-                hexLine = "0".repeat(_boardSize - hexLine.length()) + hexLine;
+            if(hexLine.length() < _boardLineSize)
+                hexLine = "0".repeat(_boardLineSize - hexLine.length()) + hexLine;
 
             sb
                     .append(hexLine)
@@ -205,5 +243,8 @@ public class Board implements IBoard
 
         // Print the board
         System.out.println(board);
+
+        // Test getPossibleMoves
+        board.getPossibleMoves(true);
     }
 }
