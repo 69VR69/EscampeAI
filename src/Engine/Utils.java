@@ -30,4 +30,23 @@ public class Utils
         return new Move(move.getEndPosition(), move.getStartPosition());
     }
 
+    /**
+     * Convert a int into an hexadecimal string
+     * @value the int to convert
+     * @return the hexadecimal string
+     */
+    public static String IntToHex(int value)
+    {
+        return Integer.toHexString(value);
+    }
+
+    /**
+     * Convert a hexadecimal string into an int
+     * @value the hexadecimal string to convert
+     * @return the int
+     */
+    public static int HexToInt(String value)
+    {
+        return Integer.parseInt(value, 16);
+    }
 }

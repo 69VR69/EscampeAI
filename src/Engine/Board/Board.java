@@ -5,8 +5,18 @@ import Engine.Utils;
 
 public class Board implements IBoard
 {
+    // region Constants
+    protected static final int PAWN_SIZE = 4;
+    protected static final int EMPTY_CELL = 0b0000;
+    protected static final int BLACK_PALADIN_CELL = 0b0001;
+    protected static final int BLACK_UNICORN_CELL = 0b0011;
+    protected static final int WHITE_PALADIN_CELL = 0b0101;
+    protected static final int WHITE_UNICORN_CELL = 0b0111;
+    // endregion
+
+
     // region Properties
-    // Board representing the lines of the board, by pawns (IsWhite, IsUnicorn, IsOccupied)
+    // Board representing the lines of the board, each line contains 6 pawns represented as 3 bits (IsWhite, IsUnicorn, IsOccupied)
     protected int[] _bitBoard;
     // Board representing the cells of the board by type (simple, double, triple, error)
     protected short[] _bitCells;
@@ -16,12 +26,18 @@ public class Board implements IBoard
     // endregion
 
     // region Constructors
-    public Board(int width, int height, HeuristicPipeline heuristicPipeline)
+    public Board(int size, HeuristicPipeline heuristicPipeline)
     {
-        _bitBoard = new int[width * height];
-        _bitCells = new short[width * height];
+        _bitBoard = new int[size];
+        _bitCells = new short[size];
         _heuristicPipeline = heuristicPipeline;
     }
+
+    public Board(HeuristicPipeline heuristicPipeline)
+    {
+        this(6, heuristicPipeline);
+    }
+
     public Board(Board board)
     {
         _bitBoard = board._bitBoard.clone();
@@ -52,7 +68,21 @@ public class Board implements IBoard
         IMove[] moves = new IMove[0];
 
         //Iterate over each bit in the bitboard.
-        //Determine get the
+        for (int i = 0; i < _bitBoard.length; i++) {
+            int line = _bitBoard[i];
+
+            // If the line is empty, skip it
+            if (line == 0) continue;
+
+            // If the line does not contain a pawn of the current player, skip it
+            if ((isWhite && (line & 0b0100) == 0) || (!isWhite && (line & 0b0100) != 0)) continue;
+
+            // Extract each pawn from the line
+                //TODO : IN PROGRESS
+
+        }
+
+        return moves;
     }
 
     @Override
@@ -106,4 +136,28 @@ public class Board implements IBoard
         _lastEnemyMove = lastEnnemyMove;
     }
     // endregion
+
+    @Override
+    public String toString() {
+        StringBuilder sb = new StringBuilder();
+
+        for (int i = 0, bitBoardLength = _bitBoard.length; i < bitBoardLength; i++) {
+            int line = _bitBoard[i];
+            sb.
+                    append(i+1)
+                    .append(" : ")
+                    .append(Utils.IntToHex(line))
+                    .append("\n");
+        }
+
+        return sb.toString();
+    }
+
+    public static void main(String[] args) {
+        // Create a new board
+        Board board = new Board((HeuristicPipeline) null);
+
+        // Print the board
+        System.out.println(board);
+    }
 }
