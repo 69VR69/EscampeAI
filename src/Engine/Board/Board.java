@@ -23,11 +23,13 @@ public class Board implements IBoard
     private final HeuristicPipeline _heuristicPipeline;
     // Last move made by the enemy
     private IMove _lastEnemyMove = Utils.NothingMove();
+    private int _boardSize = 6;
     // endregion
 
     // region Constructors
     public Board(int size, HeuristicPipeline heuristicPipeline)
     {
+        _boardSize = size;
         _bitBoard = new int[size];
         _bitCells = new short[size];
         _heuristicPipeline = heuristicPipeline;
@@ -40,6 +42,7 @@ public class Board implements IBoard
 
     public Board(Board board)
     {
+        _boardSize = board._boardSize;
         _bitBoard = board._bitBoard.clone();
         _bitCells = board._bitCells.clone();
         _heuristicPipeline = board._heuristicPipeline;
@@ -48,6 +51,21 @@ public class Board implements IBoard
     // endregion
 
     // region Methods
+
+    public void setBoardFromHexStrings(String[] bitBoard)
+    {
+        for (int i = 0; i < bitBoard.length; i++) {
+            _bitBoard[i] = Utils.HexToInt(bitBoard[i]);
+        }
+    }
+
+    public void setCellFromHexStrings(String[] bitCells)
+    {
+        for (int i = 0; i < bitCells.length; i++) {
+            _bitCells[i] = (short) Utils.HexToInt(bitCells[i]);
+        }
+    }
+
     @Override
     public void setPawnsOnBoard(IPawn[] pawns) {
         //Iterate over each pawn in the list.
@@ -145,8 +163,15 @@ public class Board implements IBoard
             int line = _bitBoard[i];
             sb.
                     append(i+1)
-                    .append(" : ")
-                    .append(Utils.IntToHex(line))
+                    .append(" : ");
+
+            // If the line is not boardSize, add the missing 0 at the beginning
+            String hexLine = Utils.IntToHex(line);
+            if(hexLine.length() < _boardSize)
+                hexLine = "0".repeat(_boardSize - hexLine.length()) + hexLine;
+
+            sb
+                    .append(hexLine)
                     .append("\n");
         }
 
@@ -154,8 +179,19 @@ public class Board implements IBoard
     }
 
     public static void main(String[] args) {
+        // Create a hex strings representing the board (during a game)
+        String[] bitBoard = new String[] {
+                "311000",
+                "101100",
+                "557050",
+                "005000",
+                "500000",
+                "000000"
+        };
+
         // Create a new board
         Board board = new Board((HeuristicPipeline) null);
+        board.setBoardFromHexStrings(bitBoard);
 
         // Print the board
         System.out.println(board);
