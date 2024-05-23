@@ -52,7 +52,8 @@ public class Board implements IBoard {
 
     public void setBoardFromHexStrings(String[] bitBoard) {
         for (int i = 0; i < bitBoard.length; i++) {
-            _bitBoard[i] = Utils.HexToInt(bitBoard[i]);
+            String inverseLine = new StringBuilder(bitBoard[i]).reverse().toString();
+            _bitBoard[i] = Utils.HexToInt(inverseLine);
         }
     }
 
@@ -60,8 +61,9 @@ public class Board implements IBoard {
         // Iterate over each line of the bitCells, then iterate over each cell of the line and set the corresponding bits in the bitCells
         for (int i = 0; i < bitCells.length; i++) {
             short line = 0;
+            String inverseLine = new StringBuilder(bitCells[i]).reverse().toString();
             for (int j = 0; j < bitCells[i].length(); j++) {
-                int cell = (bitCells[i].charAt(j) - '0');
+                int cell = (inverseLine.charAt(j) - '0');
                 line <<= CELL_SIZE;
                 line |= (short) cell;
             }
@@ -163,7 +165,9 @@ public class Board implements IBoard {
                 System.out.println(pawn);
 
                 // Get the cell type of the pawn
-                short cell = (short) ((_bitCells[pawn.getColumnNumber()] >> (CELL_SIZE * pawn.getLine())) & 0x3);
+                short cellLine = _bitCells[pawn.getLineNumber()];
+                var temp = cellLine >> (pawn.getColumnNumber() * CELL_SIZE);
+                short cell = (short) (temp & 0b11);
                 System.out.println("Cell type is " + cell);
             }
         }
@@ -276,11 +280,11 @@ public class Board implements IBoard {
     public static void main(String[] args) {
         // Create a hex strings representing the board (during a game)
         String[] bitBoard = new String[]{
-                "311000",
+                "300000",
                 "101100",
                 "557050",
                 "005000",
-                "500000",
+                "500110",
                 "000000"
         };
 
