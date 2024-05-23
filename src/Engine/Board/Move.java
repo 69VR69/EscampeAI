@@ -1,25 +1,23 @@
 package Engine.Board;
 
-public class Move implements IMove
-{
+public class Move implements IMove {
     // region Properties
     protected int _startPosition;
     protected int _endPosition;
     // endregion
 
     // region Constructors
-    public Move()
-    {
+    public Move() {
         _startPosition = -1;
         _endPosition = -1;
     }
-    public Move(int startPosition, int endPosition)
-    {
+
+    public Move(int startPosition, int endPosition) {
         _startPosition = startPosition;
         _endPosition = endPosition;
     }
-    public Move(Move move)
-    {
+
+    public Move(Move move) {
         _startPosition = move._startPosition;
         _endPosition = move._endPosition;
     }

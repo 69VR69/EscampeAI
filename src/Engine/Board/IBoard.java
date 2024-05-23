@@ -55,6 +55,7 @@ public interface IBoard {
 
     /**
      * Apply a move to the board with legal checks
+     *
      * @param move the move to apply
      */
     void applyMoveWithChecks(IMove move);

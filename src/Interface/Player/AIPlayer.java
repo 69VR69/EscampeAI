@@ -1,10 +1,10 @@
 package Interface.Player;
 
 
-public class AIPlayer implements IJoueur
-{
+public class AIPlayer implements IJoueur {
     /**
      * Initialize the player
+     *
      * @param mycolour the player's colour (-1 = White, 1 = Black)
      */
     @Override
@@ -14,6 +14,7 @@ public class AIPlayer implements IJoueur
 
     /**
      * Return the player's number
+     *
      * @return the player's number
      */
     @Override
@@ -24,6 +25,7 @@ public class AIPlayer implements IJoueur
 
     /**
      * Choose the best move to play
+     *
      * @return the move to play
      */
     @Override
@@ -34,6 +36,7 @@ public class AIPlayer implements IJoueur
 
     /**
      * Declare the winner of the game
+     *
      * @param colour the colour of the winner (White = -1, Black = 1)
      */
     @Override
@@ -43,10 +46,11 @@ public class AIPlayer implements IJoueur
 
     /**
      * Update the board with the opponent's move
+     *
      * @param coup the opponent's move.
-     * Can be "PASSE" if the opponent passes is turn,
-     *        a move in the form "A1-B2" or
-     *        an initialisation move in the form "D6/.../B6"
+     *             Can be "PASSE" if the opponent passes is turn,
+     *             a move in the form "A1-B2" or
+     *             an initialisation move in the form "D6/.../B6"
      */
     @Override
     public void mouvementEnnemi(String coup) {
@@ -55,6 +59,7 @@ public class AIPlayer implements IJoueur
 
     /**
      * Return the name of the players
+     *
      * @return the name of the players
      */
     @Override

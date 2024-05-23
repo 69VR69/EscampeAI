@@ -7,6 +7,7 @@ public interface IHeuristics {
 
     /**
      * Evaluate the board
+     *
      * @param board The board to evaluate
      * @return The evaluation of the board
      */
