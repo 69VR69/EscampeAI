@@ -89,7 +89,44 @@ public class Board implements IBoard
         //Iterate over each bit in the bitboard.
         //Determine the piece type (paladin or licorne) and player color based on the bit positions.
         //Construct the string representation accordingly.
-        return null;
+    	String header = "% ABCDEF";
+    	
+    	String output = header + "\n";
+    	
+    	int row = 0;
+		for (int i = 0; i < this._bitBoard.length; i++) {
+			int line = this._bitBoard[i];
+			output += (i+1) + " ";
+			
+			for (int j = 0; j<_bitBoard.length; j++) {
+				int cell = line & 0b111;
+				
+				if ( (cell&0b001) != 0 ) {
+					switch (cell) {
+						case BLACK_PALADIN_CELL:
+							output += "n";
+							break;
+						case BLACK_UNICORN_CELL:
+							output += "N";
+							break;
+						case WHITE_PALADIN_CELL:
+							output += "b";
+							break;
+						case WHITE_UNICORN_CELL:
+							output += "B";
+							break;
+						default:
+							break;
+					}
+				} else {
+					output += "-";
+				}
+				line = line >> PAWN_SIZE;
+			}
+			output += "\n";
+		}
+
+        return output;
     }
 
     @Override
@@ -114,7 +151,7 @@ public class Board implements IBoard
                 // Extract the PAWN_SIZE bits from the line
                 int bits = (line >> (columnNumber * PAWN_SIZE)) & 0x7;
                 Pawn pawn = new Pawn(bits, lineNumber, columnNumber);
-                if(!pawn.__isOccupied) continue;
+                if(!pawn._isOccupied) continue;
 
                 System.out.println("Line " + lineNumber);
                 System.out.println("Bits : " + Utils.IntToBinary(bits) + " -> " + Utils.IntToBinary(line) + " >> " + (columnNumber * PAWN_SIZE) + " & " + Utils.IntToBinary(0x7));
