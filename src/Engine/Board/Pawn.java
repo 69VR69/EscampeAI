@@ -4,78 +4,78 @@ public class Pawn implements IPawn {
     // region Constants
     protected static final int PAWN_SIZE = 4;
     // endregion
-
-    protected boolean __isWhite;
-    protected boolean __isUnicorn;
-    protected boolean __isOccupied;
-    protected int __column;
-    protected int __line;
-
-    public Pawn(boolean b, boolean c, boolean d) {
-        __isWhite = b;
-        __isUnicorn = c;
-        __isOccupied = d;
-    }
-
-    public Pawn(int bits) {
-        __isWhite = ((bits & 0b0100) == 0b0100);
-        __isUnicorn = ((bits & 0b0010) == 0b0010);
-        __isOccupied = ((bits & 0b0001) == 0b0001);
-    }
+    
+	protected boolean _isWhite;
+	protected boolean _isUnicorn;
+	protected boolean _isOccupied;
+	protected int _column;
+	protected int _line;
+	
+	public Pawn(boolean isWhite, boolean isUnicorn, boolean isOccupied) {
+		_isWhite = isWhite;
+		_isUnicorn = isUnicorn;
+		_isOccupied = isOccupied;
+	}
+	
+	public Pawn(int bits) {
+		_isWhite = ((bits & 0b0100) == 0b0100);
+		_isUnicorn = ((bits & 0b0010) == 0b0010);
+		_isOccupied = ((bits & 0b0001) == 0b0001);
+	}
 
     public Pawn(int bits, int line, int column) {
-        __isWhite = ((bits & 0b0100) == 0b0100);
-        __isUnicorn = ((bits & 0b0010) == 0b0010);
-        __isOccupied = ((bits & 0b0001) == 0b0001);
-        __line = line;
-        __column = column;
+        _isWhite = ((bits & 0b0100) == 0b0100);
+        _isUnicorn = ((bits & 0b0010) == 0b0010);
+        _isOccupied = ((bits & 0b0001) == 0b0001);
+        _line = line;
+        _column = column;
     }
+	
+	private boolean checkPosition(String a) {
+		return  (_column > 5 || _column < 0 || _line > 5 || _line < 0);
+	}
 
-    private boolean checkPosition(String a) {
-        return (__column > 5 || __column < 0 || __line > 5 || __line < 0);
-    }
+	@Override
+	public boolean getIsWhite() {
+		return _isWhite;
+	}
 
-    @Override
-    public boolean getIsWhite() {
-        return __isWhite;
-    }
+	@Override
+	public boolean getIsUnicorn() {
+		return _isUnicorn;
+	}
 
-    @Override
-    public boolean getIsUnicorn() {
-        return __isUnicorn;
-    }
+	@Override
+	public boolean getIsOccupied() {
+		return _isOccupied;
+	}
 
-    @Override
-    public boolean getIsOccupied() {
-        return __isOccupied;
-    }
+	@Override
+	public int getLineNumber() {
+		return _line;
+	}
 
-    @Override
-    public int getLineNumber() {
-        return __line;
-    }
+	@Override
+	public int getColumnNumber() {
+		return _column;
+	}
 
-    @Override
-    public int getColumnNumber() {
-        return __column;
-    }
-
-    @Override
-    public int getLine() {
-        int representation = 0;
-        representation = representation | (__isWhite ? 0b100 : 0b000);
-        representation = representation | (__isUnicorn ? 0b010 : 0b000);
-        representation = representation | (__isOccupied ? 0b001 : 0b000);
-
-        return representation << __column * PAWN_SIZE;
-    }
+	@Override
+	public int getLine() {
+		int representation = 0;
+		representation = representation | (_isWhite ? 0b100 : 0b000);
+		representation = representation | (_isUnicorn ? 0b010 : 0b000);
+        representation = representation | (_isOccupied ? 0b001 : 0b000);
+        
+		return representation << _column * PAWN_SIZE;
+	}
 
     @Override
     public String toString() {
-        return __isOccupied ?
-                (__isWhite ? "White" : "Black") +
-                (__isUnicorn ? " Unicorn" : " Paladin") +
-                " at (" + __line + ", " + __column + ")" :
-                "Empty cell at (" + __line + ", " + __column + ")";
+        return _isOccupied ?
+                (_isWhite ? "White" : "Black") +
+                (_isUnicorn ? " Unicorn" : " Paladin") +
+                " at (" + _line + ", " + _column + ")" :
+                "Empty cell at (" + _line + ", " + _column + ")";
     }
 }
