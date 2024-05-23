@@ -169,6 +169,45 @@ public class Board implements IBoard {
                 var temp = cellLine >> (pawn.getColumnNumber() * CELL_SIZE);
                 short cell = (short) (temp & 0b11);
                 System.out.println("Cell type is " + cell);
+
+                // Get the number of moves the pawn can do by multiplying the cell type by 4 directions
+                int nbMaxMoves = cell * 4;
+
+                // Get the possible moves of the pawn
+                int lowerLimit = pawn.getColumnNumber();
+                int upperLimit = pawn.getLineNumber() + cell;
+                int negativeUpperLimit = pawn.getLineNumber() - cell;
+                int x = lowerLimit, y = upperLimit;
+                int a = 0, b = 0;
+                for (int i = 0; i < nbMaxMoves; i++) {
+
+                    // Update the coordinates
+                    if (x == lowerLimit && y == upperLimit) {
+                        a = 1;
+                        b = -1;
+                    } else if (x == upperLimit && y == lowerLimit) {
+                        a = -1;
+                        b = -1;
+                    } else if (x == lowerLimit && y == negativeUpperLimit) {
+                        a = -1;
+                        b = 1;
+                    } else if (x == negativeUpperLimit && y == lowerLimit) {
+                        a = 1;
+                        b = 1;
+                    }
+
+                    x += a;
+                    y += b;
+
+                    System.out.println("(" + x + ", " + y + ")");
+
+                }
+
+/*(4, 5)
+(5, 4)
+(4, 3)
+(3, 2)
+                * */
             }
         }
 
