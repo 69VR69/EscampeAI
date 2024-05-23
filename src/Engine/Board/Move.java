@@ -2,19 +2,19 @@ package Engine.Board;
 
 public class Move implements IMove {
     // region Properties
-    protected int _startPosition;
-    protected int _endPosition;
+    protected Position _startPosition;
+    protected Position _endPosition;
     // endregion
 
     // region Constructors
     public Move() {
-        _startPosition = -1;
-        _endPosition = -1;
+    	_startPosition = new Position();
+    	_endPosition = new Position();
     }
 
-    public Move(int startPosition, int endPosition) {
-        _startPosition = startPosition;
-        _endPosition = endPosition;
+    public Move(int startLine, int startColumn, int endLine, int endColumn) {
+    	_startPosition = new Position(startLine, startColumn);
+    	_endPosition = new Position(endLine, endColumn);
     }
 
     public Move(Move move) {
@@ -26,16 +26,17 @@ public class Move implements IMove {
     // region Methods
     @Override
     public String getString() {
-        return "";
+        char letter = (char) ('A' + _startPosition.getColumn());
+        return letter + Integer.toString(_startPosition.getLine());
     }
 
     @Override
-    public int getStartPosition() {
+    public Position getStartPosition() {
         return _startPosition;
     }
 
     @Override
-    public int getEndPosition() {
+    public Position getEndPosition() {
         return _endPosition;
     }
     // endregion

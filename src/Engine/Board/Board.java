@@ -260,9 +260,22 @@ public class Board implements IBoard {
     public void applyMove(IMove move, boolean bypassChecks) {
         //Apply the move to the board.
         if (bypassChecks || IsMoveValid(move)) {
-            int tmp = this._bitBoard[move.getEndPosition()];
-            this._bitBoard[move.getEndPosition()] = this._bitBoard[move.getStartPosition()];
-            this._bitBoard[move.getStartPosition()] = tmp;
+/*            //TODO
+//            int tmp = this._bitBoard[move.getEndPosition()];
+//            this._bitBoard[move.getEndPosition()] = this._bitBoard[move.getStartPosition()];
+//            this._bitBoard[move.getStartPosition()] = tmp;
+        	
+        	int tmp = this._bitBoard[move.getStartPosition().getLine()];
+        	// 000 001 000 011 000 111 -> get i-th group of bits
+        	tmp = (tmp >> (move.getStartPosition().getColumn() * PAWN_SIZE)) & 0x7;
+        	
+        	
+//            for (int columnNumber = 0; columnNumber < _boardLineSize; columnNumber++) {
+//                // Extract the PAWN_SIZE bits from the line
+//                int bits = (line >> (columnNumber * PAWN_SIZE)) & 0x7;
+//            }
+
+*/        	
         }
     }
 

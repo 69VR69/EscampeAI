@@ -11,10 +11,10 @@ public interface IMove {
     /**
      * Get the start position of the move
      */
-    int getStartPosition();
-
+    Position getStartPosition();
+    
     /**
      * Get the end position of the move
      */
-    int getEndPosition();
+    Position getEndPosition();
 }
