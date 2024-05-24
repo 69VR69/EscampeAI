@@ -4,6 +4,7 @@ import Engine.Heuristics.HeuristicPipeline;
 import Engine.Utils;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 
 public class Board implements IBoard {
     // region Constants
@@ -162,18 +163,18 @@ public class Board implements IBoard {
                 // If the pawn is not of the current player, skip it
                 if (pawn._isWhite != isWhite) continue;
 
-                System.out.println(pawn);
+                //System.out.println(pawn);
 
                 // Get the cell type of the pawn
                 short cell = getCellFromPosition(pawn.getPosition());
-                System.out.println("Cell type is " + cell);
+                //System.out.println("Cell type is " + cell);
 
                 // If the cell is an error, skip it
                 if (cell == 0) continue;
 
                 // If the cell doesn't correspond to last enemy move, skip it
                 short enemyLastCell = getCellFromPosition(_lastEnemyMove.getEndPosition());
-                System.out.println("Enemy last cell is " + enemyLastCell + " and pawn cell is " + cell);
+                //System.out.println("Enemy last cell is " + enemyLastCell + " and pawn cell is " + cell);
                 if (cell != enemyLastCell) continue;
 
                 // Get the number of moves the pawn can do by multiplying the cell type by 4 directions
@@ -199,10 +200,8 @@ public class Board implements IBoard {
 
                     pos.add(increments);
 
-                    System.out.println(pos);
-
                     // Check if the position is valid
-                    if (pos.isInBounds(_boardLineSize)) continue;
+                    if (!pos.isInBounds(_boardLineSize)) continue;
 
                     // Check if the cell at the new position is empty from bitboard
                     IPawn cellPawn = getPawnFromPosition(pos);
@@ -210,8 +209,11 @@ public class Board implements IBoard {
 
                     // Check if the move is not already in the list
                     IMove move = new Move(pawn.getPosition(), pos);
-                    if (!moves.contains(move))
-                        moves.add(move);
+                    System.out.println("Checking move : " + move);
+                    //if (!moves.contains(move)) {
+                    moves.add(move);
+                    //}
+                    System.out.println(Arrays.toString(moves.toArray()));
                 }
             }
         }
@@ -364,7 +366,7 @@ public class Board implements IBoard {
         };
 
         // Create fake last enemy move
-        IMove lastEnemyMove = new Move(new Position(0, 0), new Position(1, 2));
+        IMove lastEnemyMove = new Move(new Position(0, 0), new Position(0, 0));
 
         // Create a new board
         Board board = new Board((HeuristicPipeline) null);
