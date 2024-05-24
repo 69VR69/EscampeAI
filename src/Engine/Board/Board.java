@@ -165,10 +165,16 @@ public class Board implements IBoard {
                 System.out.println(pawn);
 
                 // Get the cell type of the pawn
-                short cellLine = _bitCells[pawn.getLineNumber()];
-                var temp = cellLine >> (pawn.getColumnNumber() * CELL_SIZE);
-                short cell = (short) (temp & 0b11);
+                short cell = getCellFromPosition(pawn.getPosition());
                 System.out.println("Cell type is " + cell);
+
+                // If the cell is an error, skip it
+                if (cell == 0) continue;
+
+                // If the cell doesn't correspond to last enemy move, skip it
+                short enemyLastCell = getCellFromPosition(_lastEnemyMove.getEndPosition());
+                System.out.println("Enemy last cell is " + enemyLastCell + " and pawn cell is " + cell);
+                if (cell != enemyLastCell) continue;
 
                 // Get the number of moves the pawn can do by multiplying the cell type by 4 directions
                 int nbMaxMoves = cell * 4;
@@ -177,41 +183,54 @@ public class Board implements IBoard {
                 int lowerLimit = pawn.getColumnNumber();
                 int upperLimit = pawn.getLineNumber() + cell;
                 int negativeUpperLimit = pawn.getLineNumber() - cell;
-                int x = lowerLimit, y = upperLimit;
-                int a = 0, b = 0;
+                Position pos = new Position(lowerLimit, upperLimit);
+                Position increments = new Position(0, 0);
                 for (int i = 0; i < nbMaxMoves; i++) {
 
                     // Update the coordinates
-                    if (x == lowerLimit && y == upperLimit) {
-                        a = 1;
-                        b = -1;
-                    } else if (x == upperLimit && y == lowerLimit) {
-                        a = -1;
-                        b = -1;
-                    } else if (x == lowerLimit && y == negativeUpperLimit) {
-                        a = -1;
-                        b = 1;
-                    } else if (x == negativeUpperLimit && y == lowerLimit) {
-                        a = 1;
-                        b = 1;
-                    }
+                    if (pos.equals(new Position(lowerLimit, upperLimit)))
+                        increments.setTo(1, -1);
+                    else if (pos.equals(new Position(upperLimit, lowerLimit)))
+                        increments.setTo(-1, -1);
+                    else if (pos.equals(new Position(lowerLimit, negativeUpperLimit)))
+                        increments.setTo(-1, 1);
+                    else if (pos.equals(new Position(negativeUpperLimit, lowerLimit)))
+                        increments.setTo(1, 1);
 
-                    x += a;
-                    y += b;
+                    pos.add(increments);
 
-                    System.out.println("(" + x + ", " + y + ")");
+                    System.out.println(pos);
 
+                    // Check if the position is valid
+                    if (pos.isInBounds(_boardLineSize)) continue;
+
+                    // Check if the cell at the new position is empty from bitboard
+                    IPawn cellPawn = getPawnFromPosition(pos);
+                    if (cellPawn == null || cellPawn.getIsOccupied()) continue;
+
+                    // Check if the move is not already in the list
+                    IMove move = new Move(pawn.getPosition(), pos);
+                    if (!moves.contains(move))
+                        moves.add(move);
                 }
-
-/*(4, 5)
-(5, 4)
-(4, 3)
-(3, 2)
-                * */
             }
         }
 
         return moves.toArray(new IMove[0]);
+    }
+
+    private IPawn getPawnFromPosition(Position position) {
+        // Check if the position is valid
+        if (position.getLine() < 0 || position.getLine() >= _bitBoard.length || position.getColumn() < 0 || position.getColumn() >= _boardLineSize)
+            return null;
+
+        // Get the line of the pawn
+        int line = _bitBoard[position.getLine()];
+
+        // Get the bits of the pawn
+        int bits = (line >> (position.getColumn() * PAWN_SIZE)) & 0x7;
+
+        return new Pawn(bits, position.getLine(), position.getColumn());
     }
 
     private boolean containsSpecificPiece(int line, int piece) {
@@ -225,20 +244,14 @@ public class Board implements IBoard {
         return (line & mask) != 0;
     }
 
-    private boolean containsWhitePaladin(int line) {
-        return (line & 0x555555) != 0;
-    }
+    private short getCellFromPosition(Position position) {
+        // Check if the position is valid
+        if (position.getLine() < 0 || position.getLine() >= _bitCells.length || position.getColumn() < 0 || position.getColumn() >= _boardLineSize)
+            return 0;
 
-    private boolean containsWhiteUnicorn(int line) {
-        return (line & 0x777777) != 0;
-    }
-
-    private boolean containsBlackPaladin(int line) {
-        return (line & 0x1111111) != 0;
-    }
-
-    private boolean containsBlackUnicorn(int line) {
-        return (line & 0x3333333) != 0;
+        short cellLine = _bitCells[position.getLine()];
+        int temp = cellLine >> (position.getColumn() * CELL_SIZE);
+        return (short) (temp & 0b11);
     }
 
     @Override
@@ -275,7 +288,7 @@ public class Board implements IBoard {
 //                int bits = (line >> (columnNumber * PAWN_SIZE)) & 0x7;
 //            }
 
-*/        	
+*/
         }
     }
 
@@ -350,10 +363,14 @@ public class Board implements IBoard {
                 "322132"
         };
 
+        // Create fake last enemy move
+        IMove lastEnemyMove = new Move(new Position(0, 0), new Position(1, 2));
+
         // Create a new board
         Board board = new Board((HeuristicPipeline) null);
         board.setCellFromDecString(bitCells);
         board.setBoardFromHexStrings(bitBoard);
+        board.setLastEnemyMove(lastEnemyMove);
 
         // Print the board
         System.out.println(board);
@@ -366,6 +383,10 @@ public class Board implements IBoard {
         System.out.println();
 
         // Test getPossibleMoves
-        board.getPossibleMoves(false);
+        IMove[] possibleMoves = board.getPossibleMoves(false);
+        System.out.println("Possible moves : ");
+        for (IMove move : possibleMoves) {
+            System.out.println(move);
+        }
     }
 }

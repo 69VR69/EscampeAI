@@ -45,4 +45,26 @@ public class Move implements IMove {
         return _endPosition;
     }
     // endregion
+
+    @Override
+    public String toString() {
+    	return _startPosition.getBoardString() + " -> " + _endPosition.getBoardString();
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+    	if (obj == null) {
+    		return false;
+    	}
+
+    	if (obj == this) {
+    		return true;
+    	}
+
+    	if (!(obj instanceof Move move)) {
+    		return false;
+    	}
+
+        return _startPosition.equals(move._startPosition) && _endPosition.equals(move._endPosition);
+    }
 }

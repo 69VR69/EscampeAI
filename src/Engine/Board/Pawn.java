@@ -5,22 +5,20 @@ public class Pawn implements IPawn {
     protected static final int PAWN_SIZE = 4;
     // endregion
 
+    // region Properties
     protected boolean _isWhite;
     protected boolean _isUnicorn;
     protected boolean _isOccupied;
     protected int _column;
     protected int _line;
+    protected Position _position;
+    // endregion
 
+    // region Constructors
     public Pawn(boolean isWhite, boolean isUnicorn, boolean isOccupied) {
         _isWhite = isWhite;
         _isUnicorn = isUnicorn;
         _isOccupied = isOccupied;
-    }
-
-    public Pawn(int bits) {
-        _isWhite = ((bits & 0b0100) == 0b0100);
-        _isUnicorn = ((bits & 0b0010) == 0b0010);
-        _isOccupied = ((bits & 0b0001) == 0b0001);
     }
 
     public Pawn(int bits, int line, int column) {
@@ -29,12 +27,17 @@ public class Pawn implements IPawn {
         _isOccupied = ((bits & 0b0001) == 0b0001);
         _line = line;
         _column = column;
+        _position = new Position(_line, _column);
     }
+    // endregion
 
+    // region Methods
     private boolean checkPosition(String a) {
         return (_column > 5 || _column < 0 || _line > 5 || _line < 0);
     }
+    // endregion
 
+    // region Getters and Setters
     @Override
     public boolean getIsWhite() {
         return _isWhite;
@@ -70,6 +73,11 @@ public class Pawn implements IPawn {
         return representation << _column * PAWN_SIZE;
     }
 
+    public Position getPosition() {
+        return _position;
+    }
+    // endregion
+
     @Override
     public String toString() {
         return _isOccupied ?
@@ -78,4 +86,5 @@ public class Pawn implements IPawn {
                         " at (" + (_line + 1) + ", " + (_column + 1) + ")" :
                 "Empty cell at (" + (_line + 1) + ", " + (_column + 1) + ")";
     }
+
 }

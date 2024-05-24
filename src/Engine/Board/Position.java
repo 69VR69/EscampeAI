@@ -17,8 +17,26 @@ public class Position implements IPosition {
 		this._column = column;
 	}
 	// endregion
+
+	// region Methods
+	public void add(IPosition position) {
+		_line += position.getLine();
+		_column += position.getColumn();
+	}
+
+	@Override
+	public String getBoardString() {
+		char letter = (char) ('A' + _column);
+		return letter + Integer.toString(_line + 1);
+	}
+
+	@Override
+	public boolean isInBounds(int size) {
+		return _line >= 0 && _line < size && _column >= 0 && _column < size;
+	}
+	// endregion
 	
-    // region Methods
+    // region Getters & Setters
 	@Override
 	public int getLine() {
 		return _line;
@@ -28,5 +46,33 @@ public class Position implements IPosition {
 	public int getColumn() {
 		return _column;
 	}
+
+	@Override
+	public void setTo(int line, int column) {
+		_line = line;
+		_column = column;
+	}
 	// endregion
+
+	@Override
+	public String toString() {
+		return "(" + _line + ", " + _column + ")";
+	}
+
+	@Override
+	public boolean equals(Object obj) {
+		if (obj == null) {
+			return false;
+		}
+
+		if (obj == this) {
+			return true;
+		}
+
+		if (!(obj instanceof Position other)) {
+			return false;
+		}
+
+        return _line == other.getLine() && _column == other.getColumn();
+	}
 }
