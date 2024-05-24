@@ -31,7 +31,7 @@ public class Utils {
     }
 
     /**
-     * Convert a int into an hexadecimal string
+     * Convert an int into a hexadecimal string
      *
      * @return the hexadecimal string
      * @value the int to convert

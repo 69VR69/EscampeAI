@@ -17,6 +17,11 @@ public class Move implements IMove {
     	_endPosition = new Position(endLine, endColumn);
     }
 
+    public Move(Position startPosition, Position endPosition) {
+        _startPosition = startPosition;
+        _endPosition = endPosition;
+    }
+
     public Move(Move move) {
         _startPosition = move._startPosition;
         _endPosition = move._endPosition;
