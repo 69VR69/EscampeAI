@@ -22,7 +22,7 @@ public interface IBoard {
      * @param isWhite true if the current player is white, false otherwise
      * @return an array of possible moves
      */
-    IMove[] getPossibleMoves(boolean isWhite);
+    Move[] getPossibleMoves(boolean isWhite);
 
     /**
      * Clone the board
@@ -66,4 +66,27 @@ public interface IBoard {
      * @param move the move to undo
      */
     void undoMove(IMove move);
+
+    /**
+     * Check if the board is empty
+     *
+     * @return true if the board is empty, false otherwise
+     */
+    boolean isEmpty();
+
+    /**
+     * Get the initialisation move
+     *
+     * @param isWhite true if the current player is white, false otherwise
+     * @return the initialisation move
+     */
+    String getInitialisationMove(boolean isWhite);
+
+    /**
+     * Apply the initialisation move
+     *
+     * @param initMove the initialisation move
+     * @param s        true if the current player is white, false otherwise
+     */
+    void applyInitialisationMove(String initMove, boolean s);
 }

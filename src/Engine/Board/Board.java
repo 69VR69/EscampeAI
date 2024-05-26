@@ -135,8 +135,8 @@ public class Board implements IBoard {
     }
 
     @Override
-    public IMove[] getPossibleMoves(boolean isWhite) {
-        ArrayList<IMove> moves = new ArrayList<>();
+    public Move[] getPossibleMoves(boolean isWhite) {
+        ArrayList<Move> moves = new ArrayList<>();
 
         int unicorn = isWhite ? WHITE_UNICORN_CELL : BLACK_UNICORN_CELL;
         int paladin = isWhite ? WHITE_PALADIN_CELL : BLACK_PALADIN_CELL;
@@ -208,7 +208,7 @@ public class Board implements IBoard {
                     if (cellPawn == null || cellPawn.getIsOccupied()) continue;
 
                     // Check if the move is not already in the list
-                    IMove move = new Move(pawn.getPosition(), pos);
+                    Move move = new Move(pawn.getPosition(), pos);
                     System.out.println("Checking move : " + move);
                     //if (!moves.contains(move)) {
                     moves.add(move);
@@ -218,7 +218,7 @@ public class Board implements IBoard {
             }
         }
 
-        return moves.toArray(new IMove[0]);
+        return moves.toArray(new Move[0]);
     }
 
     private IPawn getPawnFromPosition(Position position) {
@@ -272,6 +272,14 @@ public class Board implements IBoard {
     }
 
     @Override
+    public boolean isEmpty() {
+        for (int j : _bitBoard)
+            if (j != 0) return false;
+
+        return true;
+    }
+
+    @Override
     public void applyMove(IMove move, boolean bypassChecks) {
         //Apply the move to the board.
         if (bypassChecks || IsMoveValid(move)) {
@@ -307,6 +315,29 @@ public class Board implements IBoard {
     private boolean IsMoveValid(IMove move) {
         //Check if the move is valid.
         return false;
+    }
+
+    @Override
+    public String getInitialisationMove(boolean isWhite) {
+        if (isWhite) {
+            return "A1/A2/B1/B2/E2/D1";
+        } else {
+            return "A6/A5/B6/B5/E5/D6";
+        }
+    }
+
+    @Override
+    public void applyInitialisationMove(String initMove, boolean isWhite) {
+        //Apply the initialisation move to the board.
+        String[] poss = initMove.split("/");
+        boolean isUnicorn = true;
+        for (String pos : poss) {
+            Position position = Position.getPositionFromString(pos);
+            int cellType = isUnicorn ? (isWhite ? WHITE_UNICORN_CELL : BLACK_UNICORN_CELL) : (isWhite ? WHITE_PALADIN_CELL : BLACK_PALADIN_CELL);
+            _bitBoard[position.getLine()] |= cellType << (position.getColumn() * PAWN_SIZE);
+
+            isUnicorn = false;
+        }
     }
 
     // endregion

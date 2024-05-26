@@ -1,7 +1,27 @@
 package Interface.Player;
 
 
+import Engine.Board.Board;
+import Engine.Board.IBoard;
+import Engine.Board.Move;
+import Engine.Heuristics.DistanceToEnnemy;
+import Engine.Heuristics.HeuristicPipeline;
+import Engine.Heuristics.IHeuristics;
+import Engine.IA.AlphaBetaAlgorithm;
+
+import java.util.HashMap;
+
 public class AIPlayer implements IJoueur {
+    // region Constants
+    private static final int MAX_DEPTH = 3;
+    // endregion
+
+    private int nbMoves = 0;
+    protected boolean isWhite = false;
+    protected boolean enemyStartFromTop = false;
+    protected IBoard board;
+    protected AlphaBetaAlgorithm alphaBetaAlgorithm;
+
     /**
      * Initialize the player
      *
@@ -9,7 +29,16 @@ public class AIPlayer implements IJoueur {
      */
     @Override
     public void initJoueur(int mycolour) {
-        // TODO : implement this method by initializing the player
+        isWhite = mycolour == -1;
+
+        HeuristicPipeline heuristics = new HeuristicPipeline(new HashMap<IHeuristics, Float>() {
+            {
+                put(new DistanceToEnnemy(), 1f);
+            }
+        });
+        board = new Board(heuristics);
+
+        alphaBetaAlgorithm = new AlphaBetaAlgorithm(MAX_DEPTH);
     }
 
     /**
@@ -19,8 +48,7 @@ public class AIPlayer implements IJoueur {
      */
     @Override
     public int getNumJoueur() {
-        // TODO : implement this method by returning the player's number
-        return 0;
+        return isWhite ? -1 : 1;
     }
 
     /**
@@ -30,8 +58,20 @@ public class AIPlayer implements IJoueur {
      */
     @Override
     public String choixMouvement() {
-        // TODO : implement this method by returning the best move to play
-        return "";
+        String moveString;
+        if (nbMoves <= 2) {
+            moveString = board.getInitialisationMove(enemyStartFromTop);
+            board.applyInitialisationMove(moveString,enemyStartFromTop);
+        } else {
+            Move move = alphaBetaAlgorithm.getBestMove(board, isWhite);
+            board.applyMoveWithChecks(move);
+            moveString = move.toString();
+        }
+
+        nbMoves++;
+        System.out.println(board);
+
+        return moveString;
     }
 
     /**
@@ -41,7 +81,10 @@ public class AIPlayer implements IJoueur {
      */
     @Override
     public void declareLeVainqueur(int colour) {
-        // TODO : implement this method by showing depending if the current player won or not
+        if (colour == getNumJoueur())
+            System.out.println("I won !");
+        else
+            System.out.println("I lost !");
     }
 
     /**
@@ -54,7 +97,21 @@ public class AIPlayer implements IJoueur {
      */
     @Override
     public void mouvementEnnemi(String coup) {
-        // TODO : implement this method by updating the board with the opponent's move
+        if (nbMoves <= 2) {
+            enemyStartFromTop = isStartingFromTop(coup);
+            board.applyInitialisationMove(coup, enemyStartFromTop);
+            nbMoves++;
+        } else {
+            Move enemyMove = new Move(coup);
+            board.applyMoveWithChecks(enemyMove);
+            nbMoves++;
+        }
+        System.out.println(board);
+    }
+
+    private boolean isStartingFromTop(String initMove) {
+        return initMove.contains("A6") || initMove.contains("B6") || initMove.contains("C6") || initMove.contains("D6") || initMove.contains("E6") || initMove.contains("F6")
+                || initMove.contains("A5") || initMove.contains("B5") || initMove.contains("C5") || initMove.contains("D5") || initMove.contains("E5") || initMove.contains("F5");
     }
 
     /**

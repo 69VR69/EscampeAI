@@ -1,6 +1,8 @@
 package Engine.IA;
 
 import Engine.Board.IBoard;
+import Engine.Board.IMove;
+import Engine.Board.Move;
 import Engine.Utils;
 
 public class AlphaBetaAlgorithm {
@@ -19,19 +21,23 @@ public class AlphaBetaAlgorithm {
      * @param isWhite true if the current player is white, false otherwise
      * @return the best move
      */
-    public EvaluatedMove getBestMove(IBoard board, boolean isWhite) {
+    public Move getBestMove(IBoard board, boolean isWhite) {
         // Security check
         if (board == null)
             return NothingMove;
 
         // Initialize the variables
-        EvaluatedMove bestMove = NothingMove;
+        Move bestMove = NothingMove;
         int alpha = Integer.MIN_VALUE;
         int beta = Integer.MAX_VALUE;
         IBoard tempBoard = board.Clone();
 
         // Get the possible moves
-        EvaluatedMove[] moves = (EvaluatedMove[]) tempBoard.getPossibleMoves(isWhite);
+        Move[] temp = (Move[]) tempBoard.getPossibleMoves(isWhite);
+        EvaluatedMove[] moves = new EvaluatedMove[temp.length];
+        for (int i = 0; i <temp.length; i++) {
+            moves[i] = new EvaluatedMove(temp[i]);
+        }
 
         // Iterate over the possible moves
         for (EvaluatedMove move : moves) {

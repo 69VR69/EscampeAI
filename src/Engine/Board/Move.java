@@ -12,6 +12,13 @@ public class Move implements IMove {
     	_endPosition = new Position();
     }
 
+    public Move(String move) {
+        String[] splittedMoves = move.split("-");
+
+        _startPosition = Position.getPositionFromString(splittedMoves[0]);
+        _endPosition = Position.getPositionFromString(splittedMoves[1]);
+    }
+
     public Move(int startLine, int startColumn, int endLine, int endColumn) {
     	_startPosition = new Position(startLine, startColumn);
     	_endPosition = new Position(endLine, endColumn);
@@ -48,7 +55,7 @@ public class Move implements IMove {
 
     @Override
     public String toString() {
-    	return _startPosition.getBoardString() + " -> " + _endPosition.getBoardString();
+    	return _startPosition.getBoardString() + "-" + _endPosition.getBoardString();
     }
 
     @Override

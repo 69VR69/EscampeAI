@@ -30,6 +30,13 @@ public class Position implements IPosition {
 		return letter + Integer.toString(_line + 1);
 	}
 
+	public static Position getPositionFromString(String pos)
+	{
+		int line = Integer.parseInt(pos.substring(1)) - 1;
+		int column = pos.charAt(0) - 'A';
+		return new Position(line, column);
+	}
+
 	@Override
 	public boolean isInBounds(int size) {
 		return _line >= 0 && _line < size && _column >= 0 && _column < size;
