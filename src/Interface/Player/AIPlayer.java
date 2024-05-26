@@ -97,6 +97,11 @@ public class AIPlayer implements IJoueur {
      */
     @Override
     public void mouvementEnnemi(String coup) {
+        if(coup.equals("PASSE")) {
+            System.out.println("The opponent passed his turn");
+            return;
+        }
+
         if (nbMoves <= 2) {
             enemyStartFromTop = isStartingFromTop(coup);
             board.applyInitialisationMove(coup, enemyStartFromTop);
@@ -121,6 +126,6 @@ public class AIPlayer implements IJoueur {
      */
     @Override
     public String binoName() {
-        return "Roulia et PiouPiou";
+        return "Roulia et PiouPiou" + (isWhite ? " (Blanc)" : " (Noir)");
     }
 }

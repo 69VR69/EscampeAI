@@ -323,8 +323,35 @@ public class Board implements IBoard {
     }
 
     private boolean IsMoveValid(IMove move) {
-        //Check if the move is valid.
-        return false;
+        //Check if the start position is valid.
+        if(move.getStartPosition().getLine() < 0 || move.getStartPosition().getLine() >= _bitBoard.length || move.getStartPosition().getColumn() < 0 || move.getStartPosition().getColumn() >= _boardLineSize)
+            return false;
+
+        //Check if the end position is valid.
+        if(move.getEndPosition().getLine() < 0 || move.getEndPosition().getLine() >= _bitBoard.length || move.getEndPosition().getColumn() < 0 || move.getEndPosition().getColumn() >= _boardLineSize)
+            return false;
+
+        //Check if the start position is occupied.
+        int startLine = this._bitBoard[move.getStartPosition().getLine()];
+        int startColumn = move.getStartPosition().getColumn();
+        int startBits = (startLine >> (startColumn * PAWN_SIZE)) & 0x7;
+        if((startBits & 0x1) == 0)
+            return false;
+
+        //Check if the end position is not occupied.
+        int endLine = this._bitBoard[move.getEndPosition().getLine()];
+        int endColumn = move.getEndPosition().getColumn();
+        int endBits = (endLine >> (endColumn * PAWN_SIZE)) & 0x7;
+        if((endBits & 0x1) == 1)
+            return false;
+
+        //Check if the start position corresponds to the last enemy move.
+        short cell = getCellFromPosition(move.getStartPosition());
+        short enemyLastCell = getCellFromPosition(_lastEnemyMove.getEndPosition());
+        if(cell != enemyLastCell)
+            return false;
+
+        return true;
     }
 
     @Override
@@ -450,5 +477,8 @@ public class Board implements IBoard {
         for (IMove move : possibleMoves) {
             System.out.println(move);
         }
+
+        // Test initialisation move
+        System.out.println(board.getInitialisationMove(true));
     }
 }
