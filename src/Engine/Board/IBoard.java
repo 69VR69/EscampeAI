@@ -89,4 +89,26 @@ public interface IBoard {
      * @param s        true if the current player is white, false otherwise
      */
     void applyInitialisationMove(String initMove, boolean s);
+
+    /**
+     * Get the player's unicorn
+     *
+     * @return the player's unicorn
+     */
+    IPawn getPlayerUnicorn();
+
+    /**
+     * Get the board line size
+     *
+     * @return the board line size
+     */
+    int getBoardLineSize();
+
+    /**
+     * Get the pawn from a position
+     *
+     * @param pos the position
+     * @return the pawn from the position
+     */
+    IPawn getPawnFromPosition(Position pos);
 }

@@ -4,7 +4,7 @@ package Interface.Player;
 import Engine.Board.Board;
 import Engine.Board.IBoard;
 import Engine.Board.Move;
-import Engine.Heuristics.DistanceToEnnemy;
+import Engine.Heuristics.DistanceToEnemy;
 import Engine.Heuristics.HeuristicPipeline;
 import Engine.Heuristics.IHeuristics;
 import Engine.IA.AlphaBetaAlgorithm;
@@ -33,7 +33,7 @@ public class AIPlayer implements IJoueur {
 
         HeuristicPipeline heuristics = new HeuristicPipeline(new HashMap<IHeuristics, Float>() {
             {
-                put(new DistanceToEnnemy(), 1f);
+                put(new DistanceToEnemy(), 1f);
             }
         });
         board = new Board(heuristics);

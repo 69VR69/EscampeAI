@@ -216,9 +216,9 @@ public class Board implements IBoard {
                     // Check if the move is not already in the list
                     Move move = new Move(pawn.getPosition(), pos);
                     System.out.println("Checking move : " + move);
-                    //if (!moves.contains(move)) {
-                    moves.add(move);
-                    //}
+                    if (!moves.contains(move)) {
+                        moves.add(move.clone());
+                    }
                     System.out.println(Arrays.toString(moves.toArray()));
                 }
             }
@@ -227,7 +227,7 @@ public class Board implements IBoard {
         return moves.toArray(new Move[0]);
     }
 
-    private IPawn getPawnFromPosition(Position position) {
+    public IPawn getPawnFromPosition(Position position) {
         // Check if the position is valid
         if (position.getLine() < 0 || position.getLine() >= _bitBoard.length || position.getColumn() < 0 || position.getColumn() >= _boardLineSize)
             return null;
@@ -269,7 +269,9 @@ public class Board implements IBoard {
 
     @Override
     public int evaluate() {
-        return _heuristicPipeline.evaluate(this);
+        var score = _heuristicPipeline.evaluate(this);
+        System.out.println("Score : " + score);
+        return score;
     }
 
     @Override
@@ -352,6 +354,21 @@ public class Board implements IBoard {
         }
     }
 
+    @Override
+    public IPawn getPlayerUnicorn() {
+        for (int i = 0; i < _bitBoard.length; i++) {
+            int line = _bitBoard[i];
+            for (int j = 0; j < _boardLineSize; j++) {
+                int bits = (line >> (j * PAWN_SIZE)) & 0x7;
+                if ((bits & 0x3) == 0x3) {
+                    return new Pawn(bits, i, j);
+                }
+            }
+        }
+
+        return Utils.NullPawn();
+    }
+
     // endregion
 
     // region Getters & Setters
@@ -361,6 +378,10 @@ public class Board implements IBoard {
 
     public void setLastEnemyMove(IMove lastEnnemyMove) {
         _lastEnemyMove = lastEnnemyMove;
+    }
+
+    public int getBoardLineSize() {
+        return _boardLineSize;
     }
     // endregion
 

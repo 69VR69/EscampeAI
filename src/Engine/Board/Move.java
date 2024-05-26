@@ -1,6 +1,6 @@
 package Engine.Board;
 
-public class Move implements IMove {
+public class Move implements IMove, Cloneable {
     // region Properties
     protected Position _startPosition;
     protected Position _endPosition;
@@ -19,6 +19,11 @@ public class Move implements IMove {
         _endPosition = Position.getPositionFromString(splittedMoves[1]);
     }
 
+    public Move(Move move) {
+    	_startPosition = new Position(move._startPosition);
+    	_endPosition = new Position(move._endPosition);
+    }
+
     public Move(int startLine, int startColumn, int endLine, int endColumn) {
     	_startPosition = new Position(startLine, startColumn);
     	_endPosition = new Position(endLine, endColumn);
@@ -27,11 +32,6 @@ public class Move implements IMove {
     public Move(Position startPosition, Position endPosition) {
         _startPosition = startPosition;
         _endPosition = endPosition;
-    }
-
-    public Move(Move move) {
-        _startPosition = move._startPosition;
-        _endPosition = move._endPosition;
     }
     // endregion
 
@@ -74,4 +74,10 @@ public class Move implements IMove {
 
         return _startPosition.equals(move._startPosition) && _endPosition.equals(move._endPosition);
     }
+
+    @Override
+    public Move clone() {
+        return new Move(this);
+    }
+
 }

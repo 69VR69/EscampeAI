@@ -16,6 +16,11 @@ public class Position implements IPosition {
 		this._line = line;
 		this._column = column;
 	}
+
+	public Position(Position position) {
+		_line = position.getLine();
+		_column = position.getColumn();
+	}
 	// endregion
 
 	// region Methods

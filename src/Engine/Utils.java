@@ -1,9 +1,21 @@
 package Engine;
 
 import Engine.Board.IMove;
+import Engine.Board.IPawn;
 import Engine.Board.Move;
+import Engine.Board.Pawn;
 
 public class Utils {
+    public static IPawn NullPawn()
+    {
+        if(_nullPawn == null)
+        {
+            _nullPawn = new Pawn(false, false, false);
+        }
+        return _nullPawn;
+    }
+    private static IPawn _nullPawn;
+
     /**
      * Get the nothing move
      *
