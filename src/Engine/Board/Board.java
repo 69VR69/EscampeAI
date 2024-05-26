@@ -291,10 +291,6 @@ public class Board implements IBoard {
     public void applyMove(IMove move, boolean bypassChecks) {
         //Apply the move to the board.
         if (bypassChecks || IsMoveValid(move)) {
-/*            //TODO
-//            int tmp = this._bitBoard[move.getEndPosition()];
-//            this._bitBoard[move.getEndPosition()] = this._bitBoard[move.getStartPosition()];
-//            this._bitBoard[move.getStartPosition()] = tmp;
         	
             int startLine = this._bitBoard[move.getStartPosition().getLine()];
             int endLine = this._bitBoard[move.getEndPosition().getLine()];
