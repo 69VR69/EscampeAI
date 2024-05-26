@@ -276,6 +276,43 @@ public class Board implements IBoard {
 
     @Override
     public boolean isGameOver() {
+        // Check if the board contains a unicorn for each player
+        boolean whiteUnicorn = false;
+        boolean blackUnicorn = false;
+        for (int i = 0; i < _bitBoard.length; i++) {
+            int line = _bitBoard[i];
+            for (int j = 0; j < _boardLineSize; j++) {
+                int bits = (line >> (j * PAWN_SIZE)) & 0x7;
+                if ((bits & 0x3) == 0x3) {
+                    if ((bits & 0x4) == 0x4) {
+                        whiteUnicorn = true;
+                    } else {
+                        blackUnicorn = true;
+                    }
+                }
+            }
+        }
+        if(!whiteUnicorn || !blackUnicorn) return true;
+
+        // Check if both player are blocked
+        boolean whiteBlocked = true;
+        boolean blackBlocked = true;
+        for (int i = 0; i < _bitBoard.length; i++) {
+            int line = _bitBoard[i];
+            for (int j = 0; j < _boardLineSize; j++) {
+                int bits = (line >> (j * PAWN_SIZE)) & 0x7;
+                if ((bits & 0x1) == 0x1) {
+                    if (bits == 0x1) {
+                        whiteBlocked = false;
+                    } else {
+                        blackBlocked = false;
+                    }
+                }
+            }
+        }
+
+        if(whiteBlocked || blackBlocked) return true;
+
         return false;
     }
 
