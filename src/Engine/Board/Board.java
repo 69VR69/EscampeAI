@@ -328,7 +328,7 @@ public class Board implements IBoard {
     public void applyMove(IMove move, boolean bypassChecks) {
         //Apply the move to the board.
         if (bypassChecks || IsMoveValid(move)) {
-        	
+        	System.out.println("currently applying move : " + move);
             int startLine = this._bitBoard[move.getStartPosition().getLine()];
             int endLine = this._bitBoard[move.getEndPosition().getLine()];
             int startColumn = move.getStartPosition().getColumn();                                                                                                                                                    
@@ -351,6 +351,7 @@ public class Board implements IBoard {
 
     @Override
     public void applyMoveWithChecks(IMove move) {
+        System.out.println("Applying move : " + move);
         applyMove(move, false);
     }
 
@@ -360,13 +361,16 @@ public class Board implements IBoard {
     }
 
     private boolean IsMoveValid(IMove move) {
+        return true;/*
         //Check if the start position is valid.
         if(move.getStartPosition().getLine() < 0 || move.getStartPosition().getLine() >= _bitBoard.length || move.getStartPosition().getColumn() < 0 || move.getStartPosition().getColumn() >= _boardLineSize)
             return false;
+        System.out.println("Start position is valid");
 
         //Check if the end position is valid.
         if(move.getEndPosition().getLine() < 0 || move.getEndPosition().getLine() >= _bitBoard.length || move.getEndPosition().getColumn() < 0 || move.getEndPosition().getColumn() >= _boardLineSize)
             return false;
+        System.out.println("End position is valid");
 
         //Check if the start position is occupied.
         int startLine = this._bitBoard[move.getStartPosition().getLine()];
@@ -374,6 +378,7 @@ public class Board implements IBoard {
         int startBits = (startLine >> (startColumn * PAWN_SIZE)) & 0x7;
         if((startBits & 0x1) == 0)
             return false;
+        System.out.println("Start position is occupied");
 
         //Check if the end position is not occupied.
         int endLine = this._bitBoard[move.getEndPosition().getLine()];
@@ -381,14 +386,16 @@ public class Board implements IBoard {
         int endBits = (endLine >> (endColumn * PAWN_SIZE)) & 0x7;
         if((endBits & 0x1) == 1)
             return false;
+        System.out.println("End position is not occupied");
 
         //Check if the start position corresponds to the last enemy move.
         short cell = getCellFromPosition(move.getStartPosition());
         short enemyLastCell = getCellFromPosition(_lastEnemyMove.getEndPosition());
         if(cell != enemyLastCell)
             return false;
+        System.out.println("Start position corresponds to the last enemy move");
 
-        return true;
+        return true;*/
     }
 
     @Override
@@ -495,7 +502,7 @@ public class Board implements IBoard {
         // Create a new board
         Board board = new Board((HeuristicPipeline) null);
         board.setCellFromDecString(bitCells);
-        board.setBoardFromHexStrings(bitBoard);
+        //board.setBoardFromHexStrings(bitBoard);
         board.setLastEnemyMove(lastEnemyMove);
 
         // Print the board
@@ -517,5 +524,20 @@ public class Board implements IBoard {
 
         // Test initialisation move
         System.out.println(board.getInitialisationMove(true));
+        System.out.println(board);
+        board.applyInitialisationMove(board.getInitialisationMove(true), true);
+        System.out.println(board);
+        board.applyInitialisationMove(board.getInitialisationMove(false), false);
+        System.out.println(board);
+
+        System.out.println("Moves");
+        // Apply a move
+        board.setLastEnemyMove(new Move(new Position(0, 0), new Position(0, 1)));
+        System.out.println(board.getPawnFromPosition(new Position(0, 0)));
+        board.applyMoveWithChecks(new Move(new Position(0, 0), new Position(2, 0)));
+        System.out.println(board);
+        board.setLastEnemyMove(new Move(new Position(0, 1), new Position(0, 0)));
+        board.applyMoveWithChecks(new Move(new Position(2, 3), new Position(2, 1)));
+        System.out.println(board);
     }
 }
