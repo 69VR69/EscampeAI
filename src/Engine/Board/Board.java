@@ -34,6 +34,12 @@ public class Board implements IBoard {
         _bitBoard = new int[size];
         _bitCells = new short[size];
         _heuristicPipeline = heuristicPipeline;
+        
+        // Init bits to 0
+        for (int i = 0; i < _bitBoard.length; i++) {
+        	_bitBoard[i] = 0;
+        	_bitCells[i] = EMPTY_CELL;
+        }
     }
 
     public Board(HeuristicPipeline heuristicPipeline) {
@@ -288,17 +294,23 @@ public class Board implements IBoard {
 //            this._bitBoard[move.getEndPosition()] = this._bitBoard[move.getStartPosition()];
 //            this._bitBoard[move.getStartPosition()] = tmp;
         	
-        	int tmp = this._bitBoard[move.getStartPosition().getLine()];
-        	// 000 001 000 011 000 111 -> get i-th group of bits
-        	tmp = (tmp >> (move.getStartPosition().getColumn() * PAWN_SIZE)) & 0x7;
-        	
-        	
-//            for (int columnNumber = 0; columnNumber < _boardLineSize; columnNumber++) {
-//                // Extract the PAWN_SIZE bits from the line
-//                int bits = (line >> (columnNumber * PAWN_SIZE)) & 0x7;
-//            }
+            int startLine = this._bitBoard[move.getStartPosition().getLine()];
+            int endLine = this._bitBoard[move.getEndPosition().getLine()];
+            int startColumn = move.getStartPosition().getColumn();                                                                                                                                                    
+            int endColumn = move.getEndPosition().getColumn();
+            int startBits = (startLine >> (startColumn * PAWN_SIZE)) & 0x7;
+            int endBits = (endLine >> (endColumn * PAWN_SIZE)) & 0x7;
 
-*/
+        	
+            startLine &= ~(0x7 << (startColumn * PAWN_SIZE));
+            endLine &= ~(0x7 << (endColumn * PAWN_SIZE));
+
+            
+            startLine |= endBits << (startColumn * PAWN_SIZE);
+            endLine |= startBits << (endColumn * PAWN_SIZE);          
+            
+            this._bitBoard[move.getStartPosition().getLine()] = startLine;
+            this._bitBoard[move.getEndPosition().getLine()] = endLine;
         }
     }
 
