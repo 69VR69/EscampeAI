@@ -34,11 +34,11 @@ public class Board implements IBoard {
         _bitBoard = new int[size];
         _bitCells = new short[size];
         _heuristicPipeline = heuristicPipeline;
-        
+
         // Init bits to 0
         for (int i = 0; i < _bitBoard.length; i++) {
-        	_bitBoard[i] = 0;
-        	_bitCells[i] = EMPTY_CELL;
+            _bitBoard[i] = 0;
+            _bitCells[i] = EMPTY_CELL;
         }
     }
 
@@ -179,7 +179,7 @@ public class Board implements IBoard {
                 if (cell == 0) continue;
 
                 // If the cell doesn't correspond to last enemy move, skip it
-                if(_lastEnemyMove != null) {
+                if (_lastEnemyMove != null) {
                     short enemyLastCell = getCellFromPosition(_lastEnemyMove.getEndPosition());
                     //System.out.println("Enemy last cell is " + enemyLastCell + " and pawn cell is " + cell);
                     if (cell != enemyLastCell) continue;
@@ -292,7 +292,7 @@ public class Board implements IBoard {
                 }
             }
         }
-        if(!whiteUnicorn || !blackUnicorn) return true;
+        if (!whiteUnicorn || !blackUnicorn) return true;
 
         // Check if both player are blocked
         boolean whiteBlocked = true;
@@ -311,7 +311,7 @@ public class Board implements IBoard {
             }
         }
 
-        if(whiteBlocked || blackBlocked) return true;
+        if (whiteBlocked || blackBlocked) return true;
 
         return false;
     }
@@ -328,22 +328,22 @@ public class Board implements IBoard {
     public void applyMove(IMove move, boolean bypassChecks) {
         //Apply the move to the board.
         if (bypassChecks || IsMoveValid(move)) {
-        	//System.out.println("currently applying move : " + move);
+            //System.out.println("currently applying move : " + move);
             int startLine = this._bitBoard[move.getStartPosition().getLine()];
             int endLine = this._bitBoard[move.getEndPosition().getLine()];
-            int startColumn = move.getStartPosition().getColumn();                                                                                                                                                    
+            int startColumn = move.getStartPosition().getColumn();
             int endColumn = move.getEndPosition().getColumn();
             int startBits = (startLine >> (startColumn * PAWN_SIZE)) & 0x7;
             int endBits = (endLine >> (endColumn * PAWN_SIZE)) & 0x7;
 
-        	
+
             startLine &= ~(0x7 << (startColumn * PAWN_SIZE));
             endLine &= ~(0x7 << (endColumn * PAWN_SIZE));
 
-            
+
             startLine |= endBits << (startColumn * PAWN_SIZE);
-            endLine |= startBits << (endColumn * PAWN_SIZE);          
-            
+            endLine |= startBits << (endColumn * PAWN_SIZE);
+
             this._bitBoard[move.getStartPosition().getLine()] = startLine;
             this._bitBoard[move.getEndPosition().getLine()] = endLine;
         }
@@ -351,7 +351,6 @@ public class Board implements IBoard {
 
     @Override
     public void applyMoveWithChecks(IMove move) {
-        System.out.println("Applying move : " + move);
         applyMove(move, false);
     }
 
@@ -362,12 +361,12 @@ public class Board implements IBoard {
 
     private boolean IsMoveValid(IMove move) {
         //Check if the start position is valid.
-        if(move.getStartPosition().getLine() < 0 || move.getStartPosition().getLine() >= _bitBoard.length || move.getStartPosition().getColumn() < 0 || move.getStartPosition().getColumn() >= _boardLineSize)
+        if (move.getStartPosition().getLine() < 0 || move.getStartPosition().getLine() >= _bitBoard.length || move.getStartPosition().getColumn() < 0 || move.getStartPosition().getColumn() >= _boardLineSize)
             return false;
         //System.out.println("Start position is valid");
 
         //Check if the end position is valid.
-        if(move.getEndPosition().getLine() < 0 || move.getEndPosition().getLine() >= _bitBoard.length || move.getEndPosition().getColumn() < 0 || move.getEndPosition().getColumn() >= _boardLineSize)
+        if (move.getEndPosition().getLine() < 0 || move.getEndPosition().getLine() >= _bitBoard.length || move.getEndPosition().getColumn() < 0 || move.getEndPosition().getColumn() >= _boardLineSize)
             return false;
         //System.out.println("End position is valid");
 
@@ -375,7 +374,7 @@ public class Board implements IBoard {
         int startLine = this._bitBoard[move.getStartPosition().getLine()];
         int startColumn = move.getStartPosition().getColumn();
         int startBits = (startLine >> (startColumn * PAWN_SIZE)) & 0x7;
-        if((startBits & 0x1) == 0)
+        if ((startBits & 0x1) == 0)
             return false;
         //System.out.println("Start position is occupied");
 
@@ -383,17 +382,17 @@ public class Board implements IBoard {
         int endLine = this._bitBoard[move.getEndPosition().getLine()];
         int endColumn = move.getEndPosition().getColumn();
         int endBits = (endLine >> (endColumn * PAWN_SIZE)) & 0x7;
-        if((endBits & 0x1) == 1)
+        if ((endBits & 0x1) == 1)
             return false;
         //System.out.println("End position is not occupied");
 
-        if(_lastEnemyMove != null) {
+        if (_lastEnemyMove != null) {
             //Check if the start position corresponds to the last enemy move.
             short cell = getCellFromPosition(move.getStartPosition());
             short enemyLastCell = getCellFromPosition(_lastEnemyMove.getEndPosition());
             if (cell != enemyLastCell)
                 return false;
-           //System.out.println("Start position corresponds to the last enemy move");
+            //System.out.println("Start position corresponds to the last enemy move");
         }
 
         return true;
@@ -459,18 +458,17 @@ public class Board implements IBoard {
 
         for (int i = 0, bitBoardLength = _bitBoard.length; i < bitBoardLength; i++) {
             int line = _bitBoard[i];
-            sb.
-                    append(i + 1)
-                    .append(" : ");
+            sb.append(i + 1)
+              .append(" : ");
 
             // If the line is not boardSize, add the missing 0 at the beginning
             String hexLine = Utils.IntToHex(line);
             if (hexLine.length() < _boardLineSize)
                 hexLine = "0".repeat(_boardLineSize - hexLine.length()) + hexLine;
 
-            sb
-                    .append(hexLine)
-                    .append("\n");
+            sb.append(hexLine);
+            if (i != bitBoardLength - 1)
+                sb.append("\n");
         }
 
         return sb.toString();

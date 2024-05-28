@@ -81,7 +81,7 @@ public class AIPlayer implements IJoueur {
         }
 
         nbMoves++;
-        System.out.println(board);
+        System.out.println(board + "\n^-> After move : " + moveString + "\n");
 
         return moveString;
     }
@@ -123,7 +123,7 @@ public class AIPlayer implements IJoueur {
             board.setLastEnemyMove(enemyMove);
         }
         nbMoves++;
-        System.out.println(board);
+        System.out.println(board + "\n^-> After opponent move : " + coup + "\n");
     }
 
     private boolean isStartingFromTop(String initMove) {
