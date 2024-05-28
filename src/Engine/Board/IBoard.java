@@ -111,4 +111,16 @@ public interface IBoard {
      * @return the pawn from the position
      */
     IPawn getPawnFromPosition(Position pos);
+
+    /**
+     * Set the pawn to a position
+     * @param bitCells the bit cells
+     */
+    void setCellFromDecString(String[] bitCells);
+
+    /**
+     * Set the last enemy move
+     * @param lastEnemyMove the last enemy move
+     */
+    void setLastEnemyMove(IMove lastEnemyMove);
 }

@@ -1,5 +1,7 @@
 package Engine.Board;
 
+import Engine.IA.EvaluatedMove;
+
 public class Move implements IMove, Cloneable {
     // region Properties
     protected Position _startPosition;

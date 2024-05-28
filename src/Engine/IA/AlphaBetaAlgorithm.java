@@ -5,6 +5,8 @@ import Engine.Board.IMove;
 import Engine.Board.Move;
 import Engine.Utils;
 
+import java.util.Arrays;
+
 public class AlphaBetaAlgorithm {
     protected int maxDepth;
 
@@ -33,10 +35,12 @@ public class AlphaBetaAlgorithm {
         IBoard tempBoard = board.Clone();
 
         // Get the possible moves
-        Move[] temp = (Move[]) tempBoard.getPossibleMoves(isWhite);
+        Move[] temp = tempBoard.getPossibleMoves(isWhite);
         EvaluatedMove[] moves = new EvaluatedMove[temp.length];
-        for (int i = 0; i <temp.length; i++) {
-            moves[i] = new EvaluatedMove(temp[i]);
+        //System.out.println("Possible moves :");
+        for (int i = 0; i < temp.length; i++) {
+            moves[i] = new EvaluatedMove(temp[i].clone());
+            //System.out.println(moves[i]);
         }
 
         // Iterate over the possible moves

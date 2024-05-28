@@ -24,7 +24,7 @@ public class Board implements IBoard {
     protected short[] _bitCells;
     private final HeuristicPipeline _heuristicPipeline;
     // Last move made by the enemy
-    private IMove _lastEnemyMove = Utils.NothingMove();
+    private IMove _lastEnemyMove = null;
     private int _boardLineSize = 6;
     // endregion
 
@@ -102,12 +102,12 @@ public class Board implements IBoard {
         //Construct the string representation accordingly.
         String header = "% ABCDEF";
 
-        String output = header + "\n";
+        StringBuilder output = new StringBuilder(header + "\n");
 
         int row = 0;
         for (int i = 0; i < this._bitBoard.length; i++) {
             int line = this._bitBoard[i];
-            output += (i + 1) + " ";
+            output.append((i + 1)).append(" ");
 
             for (int j = 0; j < _bitBoard.length; j++) {
                 int cell = line & 0b111;
@@ -115,29 +115,29 @@ public class Board implements IBoard {
                 if ((cell & 0b001) != 0) {
                     switch (cell) {
                         case BLACK_PALADIN_CELL:
-                            output += "n";
+                            output.append("n");
                             break;
                         case BLACK_UNICORN_CELL:
-                            output += "N";
+                            output.append("N");
                             break;
                         case WHITE_PALADIN_CELL:
-                            output += "b";
+                            output.append("b");
                             break;
                         case WHITE_UNICORN_CELL:
-                            output += "B";
+                            output.append("B");
                             break;
                         default:
                             break;
                     }
                 } else {
-                    output += "-";
+                    output.append("-");
                 }
                 line = line >> PAWN_SIZE;
             }
-            output += "\n";
+            output.append("\n");
         }
 
-        return output;
+        return output.toString();
     }
 
     @Override
@@ -179,9 +179,11 @@ public class Board implements IBoard {
                 if (cell == 0) continue;
 
                 // If the cell doesn't correspond to last enemy move, skip it
-                short enemyLastCell = getCellFromPosition(_lastEnemyMove.getEndPosition());
-                //System.out.println("Enemy last cell is " + enemyLastCell + " and pawn cell is " + cell);
-                if (cell != enemyLastCell) continue;
+                if(_lastEnemyMove != null) {
+                    short enemyLastCell = getCellFromPosition(_lastEnemyMove.getEndPosition());
+                    //System.out.println("Enemy last cell is " + enemyLastCell + " and pawn cell is " + cell);
+                    if (cell != enemyLastCell) continue;
+                }
 
                 // Get the number of moves the pawn can do by multiplying the cell type by 4 directions
                 int nbMaxMoves = cell * 4;
@@ -215,11 +217,11 @@ public class Board implements IBoard {
 
                     // Check if the move is not already in the list
                     Move move = new Move(pawn.getPosition(), pos);
-                    System.out.println("Checking move : " + move);
+                    //System.out.println("Checking move : " + move);
                     if (!moves.contains(move)) {
                         moves.add(move.clone());
                     }
-                    System.out.println(Arrays.toString(moves.toArray()));
+                    //System.out.println(Arrays.toString(moves.toArray()));
                 }
             }
         }
@@ -443,8 +445,8 @@ public class Board implements IBoard {
         return _lastEnemyMove;
     }
 
-    public void setLastEnemyMove(IMove lastEnnemyMove) {
-        _lastEnemyMove = lastEnnemyMove;
+    public void setLastEnemyMove(IMove lastEnemyMove) {
+        _lastEnemyMove = lastEnemyMove;
     }
 
     public int getBoardLineSize() {

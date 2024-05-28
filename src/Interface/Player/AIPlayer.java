@@ -36,7 +36,19 @@ public class AIPlayer implements IJoueur {
                 put(new DistanceToEnemy(), 1f);
             }
         });
+
+        // Create a hex strings representing the cells of the board
+        String[] bitCells = new String[]{
+                "122312",
+                "313132",
+                "231213",
+                "213231",
+                "131312",
+                "322132"
+        };
+
         board = new Board(heuristics);
+        board.setCellFromDecString(bitCells);
 
         alphaBetaAlgorithm = new AlphaBetaAlgorithm(MAX_DEPTH);
     }
@@ -59,7 +71,7 @@ public class AIPlayer implements IJoueur {
     @Override
     public String choixMouvement() {
         String moveString;
-        if (nbMoves <= 2) {
+        if (nbMoves < 2) {
             moveString = board.getInitialisationMove(enemyStartFromTop);
             board.applyInitialisationMove(moveString,enemyStartFromTop);
         } else {
@@ -102,15 +114,15 @@ public class AIPlayer implements IJoueur {
             return;
         }
 
-        if (nbMoves <= 2) {
+        if (nbMoves < 2) {
             enemyStartFromTop = isStartingFromTop(coup);
             board.applyInitialisationMove(coup, enemyStartFromTop);
-            nbMoves++;
         } else {
             Move enemyMove = new Move(coup);
             board.applyMoveWithChecks(enemyMove);
-            nbMoves++;
+            board.setLastEnemyMove(enemyMove);
         }
+        nbMoves++;
         System.out.println(board);
     }
 
