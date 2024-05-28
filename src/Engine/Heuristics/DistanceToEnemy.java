@@ -4,21 +4,23 @@ import Engine.Board.*;
 import Engine.Utils;
 
 public class DistanceToEnemy implements IHeuristics {
+    private final int MAX_DISTANCE = 3;
+
     @Override
     public String getName() {
-        return "Distance to ennemy";
+        return "Count the number of enemy pawns in the range of " + MAX_DISTANCE + " cells";
     }
 
     @Override
     public int evaluate(IBoard board) {
-        // Calculate the minimal distance between the player's Unicorn and the enemy's Pawns
-        int minDistance = Integer.MAX_VALUE;
+        // Count the number of enemy pawns in the range
+        int nbEnemies = 0;
 
         // Find the player's Unicorn using bitwise operations
         IPawn playerUnicorn = board.getPlayerUnicorn();
         if(playerUnicorn == Utils.NullPawn()) return Integer.MAX_VALUE;
 
-        for (int cell = 1; cell <= 6; cell++) {
+        for (int cell = 1; cell <= MAX_DISTANCE; cell++) {
             // Get the number of moves the pawn can do by multiplying the cell type by 4 directions
             int nbMaxMoves = cell * 4;
 
@@ -51,16 +53,12 @@ public class DistanceToEnemy implements IHeuristics {
                 {
                     // Check if the cell is occupied by an enemy pawn
                     if (cellPawn != null && cellPawn.getIsWhite() != playerUnicorn.getIsWhite())
-                    {
-                        // Calculate the distance between the player's Unicorn and the enemy's Pawn
-                        int distance = Math.abs(playerUnicorn.getColumnNumber() - pos.getColumn()) + Math.abs(playerUnicorn.getLineNumber() - pos.getLine());
-                        if (distance < minDistance)
-                            minDistance = distance;
-                    }
+                        nbEnemies++;
                 }
             }
         }
 
-        return minDistance;
+        // Normalize the count between 0 and 10 knowing that the maximum number of enemies is 6
+        return (int) ((nbEnemies / 6.0) * 10);
     }
 }

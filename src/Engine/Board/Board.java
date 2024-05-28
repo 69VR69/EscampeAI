@@ -271,9 +271,7 @@ public class Board implements IBoard {
 
     @Override
     public int evaluate() {
-        var score = _heuristicPipeline.evaluate(this);
-        System.out.println("Score : " + score);
-        return score;
+        return _heuristicPipeline.evaluate(this);
     }
 
     @Override
@@ -330,7 +328,7 @@ public class Board implements IBoard {
     public void applyMove(IMove move, boolean bypassChecks) {
         //Apply the move to the board.
         if (bypassChecks || IsMoveValid(move)) {
-        	System.out.println("currently applying move : " + move);
+        	//System.out.println("currently applying move : " + move);
             int startLine = this._bitBoard[move.getStartPosition().getLine()];
             int endLine = this._bitBoard[move.getEndPosition().getLine()];
             int startColumn = move.getStartPosition().getColumn();                                                                                                                                                    
@@ -366,12 +364,12 @@ public class Board implements IBoard {
         //Check if the start position is valid.
         if(move.getStartPosition().getLine() < 0 || move.getStartPosition().getLine() >= _bitBoard.length || move.getStartPosition().getColumn() < 0 || move.getStartPosition().getColumn() >= _boardLineSize)
             return false;
-        System.out.println("Start position is valid");
+        //System.out.println("Start position is valid");
 
         //Check if the end position is valid.
         if(move.getEndPosition().getLine() < 0 || move.getEndPosition().getLine() >= _bitBoard.length || move.getEndPosition().getColumn() < 0 || move.getEndPosition().getColumn() >= _boardLineSize)
             return false;
-        System.out.println("End position is valid");
+        //System.out.println("End position is valid");
 
         //Check if the start position is occupied.
         int startLine = this._bitBoard[move.getStartPosition().getLine()];
@@ -379,7 +377,7 @@ public class Board implements IBoard {
         int startBits = (startLine >> (startColumn * PAWN_SIZE)) & 0x7;
         if((startBits & 0x1) == 0)
             return false;
-        System.out.println("Start position is occupied");
+        //System.out.println("Start position is occupied");
 
         //Check if the end position is not occupied.
         int endLine = this._bitBoard[move.getEndPosition().getLine()];
@@ -387,14 +385,16 @@ public class Board implements IBoard {
         int endBits = (endLine >> (endColumn * PAWN_SIZE)) & 0x7;
         if((endBits & 0x1) == 1)
             return false;
-        System.out.println("End position is not occupied");
+        //System.out.println("End position is not occupied");
 
-        //Check if the start position corresponds to the last enemy move.
-        short cell = getCellFromPosition(move.getStartPosition());
-        short enemyLastCell = getCellFromPosition(_lastEnemyMove.getEndPosition());
-        if(cell != enemyLastCell)
-            return false;
-        System.out.println("Start position corresponds to the last enemy move");
+        if(_lastEnemyMove != null) {
+            //Check if the start position corresponds to the last enemy move.
+            short cell = getCellFromPosition(move.getStartPosition());
+            short enemyLastCell = getCellFromPosition(_lastEnemyMove.getEndPosition());
+            if (cell != enemyLastCell)
+                return false;
+           //System.out.println("Start position corresponds to the last enemy move");
+        }
 
         return true;
     }
