@@ -363,7 +363,6 @@ public class Board implements IBoard {
     }
 
     private boolean IsMoveValid(IMove move) {
-        return true;/*
         //Check if the start position is valid.
         if(move.getStartPosition().getLine() < 0 || move.getStartPosition().getLine() >= _bitBoard.length || move.getStartPosition().getColumn() < 0 || move.getStartPosition().getColumn() >= _boardLineSize)
             return false;
@@ -397,7 +396,7 @@ public class Board implements IBoard {
             return false;
         System.out.println("Start position corresponds to the last enemy move");
 
-        return true;*/
+        return true;
     }
 
     @Override
