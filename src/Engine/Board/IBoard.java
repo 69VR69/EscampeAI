@@ -1,5 +1,7 @@
 package Engine.Board;
 
+import Engine.IA.EvaluatedMove;
+
 public interface IBoard
 {
     /**
@@ -116,4 +118,16 @@ public interface IBoard
      * @param lastEnemyMove the last enemy move
      */
     void setLastEnemyMove(Move lastEnemyMove);
+
+    /**
+     * Get the last enemy move
+     * @return the last enemy move
+     */
+    boolean IsMoveValid(IMove move);
+
+    /**
+     * Get the last enemy move
+     * @return the last enemy move
+     */
+    boolean IsMoveValid(EvaluatedMove move);
 }

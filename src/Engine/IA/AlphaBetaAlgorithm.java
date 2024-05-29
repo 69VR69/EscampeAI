@@ -55,7 +55,7 @@ public class AlphaBetaAlgorithm {
             tempBoard.undoMove(move);
 
             // If the value is greater than the alpha value
-            if (value > alpha) {
+            if (value > alpha && board.IsMoveValid(move)) {
                 // Update the alpha value
                 alpha = value;
                 // Update the best move
@@ -121,6 +121,9 @@ public class AlphaBetaAlgorithm {
 
         // Iterate over the possible moves
         for (EvaluatedMove move : moves) {
+
+            if(!board.IsMoveValid(move))
+                continue;
 
             // Apply the move
             board.applyMoveWithChecks(move);

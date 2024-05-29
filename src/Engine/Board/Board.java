@@ -3,6 +3,7 @@ package Engine.Board;
 import Engine.Heuristics.DistanceToEnemy;
 import Engine.Heuristics.HeuristicPipeline;
 import Engine.IA.AlphaBetaAlgorithm;
+import Engine.IA.EvaluatedMove;
 import Engine.Utils;
 
 import java.util.ArrayList;
@@ -160,7 +161,7 @@ public class Board implements IBoard {
 
                 // Get the cell type of the pawn
                 short cell = getCellFromPosition(pawn.getPosition());
-                //System.out.println("Cell type is " + cell);
+                System.out.println("Cell type is " + cell + " for pawn at " + pawn);
 
                 // If the cell is an error, skip it
                 if (cell == 0) continue;
@@ -204,15 +205,14 @@ public class Board implements IBoard {
 
                     // Check if the move is not already in the list
                     Move move = new Move(pawn.getPosition(), pos);
-                    //System.out.println("Checking move : " + move);
-                    if (!moves.contains(move)) {
+                    if (!moves.contains(move) && IsMoveValid(move)) {
+                        System.out.println("Checking move : " + move);
                         moves.add(move.clone());
                     }
-                    //System.out.println(Arrays.toString(moves.toArray()));
                 }
             }
         }
-
+        System.out.println("Possible moves : " + Arrays.toString(moves.toArray()));
         return moves.toArray(new Move[0]);
     }
 
@@ -345,7 +345,11 @@ public class Board implements IBoard {
         applyMove(Utils.GetInverseMove(move), true);
     }
 
-    private boolean IsMoveValid(IMove move) {
+    public boolean IsMoveValid(EvaluatedMove move) {
+        return IsMoveValid(new Move(move.getStartPosition(), move.getEndPosition()));
+    }
+
+    public boolean IsMoveValid(IMove move) {
         //Check if the start position is valid.
         if (move.getStartPosition().getLine() < 0 || move.getStartPosition().getLine() >= _bitBoard.length || move.getStartPosition().getColumn() < 0 || move.getStartPosition().getColumn() >= _boardLineSize)
             return false;
@@ -375,7 +379,7 @@ public class Board implements IBoard {
         // Check if a path exist between the start and end position not occupied using pathfinding
         short cell = getCellFromPosition(move.getStartPosition());
         if (cell == 2 || cell == 3) {
-            System.out.println("Checking path between " + move.getStartPosition() + " and " + move.getEndPosition());
+            System.out.println("Checking path between " + move.getStartPosition().getBoardString() + " and " + move.getEndPosition().getBoardString());
 
             int xDir = move.getEndPosition().getColumn() - move.getStartPosition().getColumn();
             int yDir = move.getEndPosition().getLine() - move.getStartPosition().getLine();
@@ -391,11 +395,14 @@ public class Board implements IBoard {
             int y = move.getStartPosition().getLine();
             int y1 = y;
 
+            if(xDirAbs + yDirAbs == 0) return false;
+            if(xDirAbs + yDirAbs > cell) return false;
+
             // Check horizontal then vertical path
             boolean isHVPathBlocked = false;
             for (int i = 0; i < xDirAbs; i++) {
                 x += xDirSign;
-                System.out.println("X(HV) - Checking path at " + new Position(y, x));
+                System.out.println("X(HV) - Checking path at " + new Position(y, x).getBoardString());
                 if (getPawnFromPosition(new Position(x, y)).getIsOccupied()) {
                     isHVPathBlocked = true;
                 }
@@ -403,7 +410,7 @@ public class Board implements IBoard {
 
             for (int i = 0; i < yDirAbs; i++) {
                 y += yDirSign;
-                System.out.println("Y(HV) - Checking path at " + new Position(y, x));
+                System.out.println("Y(HV) - Checking path at " + new Position(y, x).getBoardString());
                 if (getPawnFromPosition(new Position(x, y)).getIsOccupied()) {
                     isHVPathBlocked = true;
                 }
@@ -416,7 +423,7 @@ public class Board implements IBoard {
             boolean isVHPathBlocked = false;
             for (int i = 0; i < yDirAbs; i++) {
                 y += yDirSign;
-                System.out.println("Y(VH) - Checking path at " + new Position(y, x));
+                System.out.println("Y(VH) - Checking path at " + new Position(y, x).getBoardString());
                 if (getPawnFromPosition(new Position(x, y)).getIsOccupied()) {
                     isVHPathBlocked = true;
                 }
@@ -424,7 +431,7 @@ public class Board implements IBoard {
 
             for (int i = 0; i < xDirAbs; i++) {
                 x += xDirSign;
-                System.out.println("X(VH) - Checking path at " + new Position(y, x));
+                System.out.println("X(VH) - Checking path at " + new Position(y, x).getBoardString());
                 if (getPawnFromPosition(new Position(x, y)).getIsOccupied()) {
                     isVHPathBlocked = true;
                 }

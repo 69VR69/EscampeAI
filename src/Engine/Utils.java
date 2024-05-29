@@ -30,7 +30,6 @@ public class Utils {
 
     private static Move _nothingMove;
 
-
     /**
      * Get the inverse of a move
      *
@@ -80,5 +79,6 @@ public class Utils {
     public static int BinaryToInt(String value) {
         return Integer.parseInt(value, 2);
     }
+
 
 }
