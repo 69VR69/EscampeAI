@@ -1,14 +1,7 @@
 package Engine.Board;
 
-public interface IBoard {
-
-    /**
-     * Set up a board from list of pawns
-     *
-     * @param pawns the list of pawns
-     */
-    public void setPawnsOnBoard(IPawn[] pawns);
-
+public interface IBoard
+{
     /**
      * Get the string representation of the board
      *
@@ -122,5 +115,5 @@ public interface IBoard {
      * Set the last enemy move
      * @param lastEnemyMove the last enemy move
      */
-    void setLastEnemyMove(IMove lastEnemyMove);
+    void setLastEnemyMove(Move lastEnemyMove);
 }

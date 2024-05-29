@@ -87,4 +87,10 @@ public class Position implements IPosition {
 
         return _line == other.getLine() && _column == other.getColumn();
 	}
+
+	public static void main(String[] args) {
+		String test = "F6";
+		Position pos = Position.getPositionFromString(test);
+		System.out.println(pos);
+	}
 }

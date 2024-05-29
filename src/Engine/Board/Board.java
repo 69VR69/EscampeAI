@@ -1,10 +1,13 @@
 package Engine.Board;
 
+import Engine.Heuristics.DistanceToEnemy;
 import Engine.Heuristics.HeuristicPipeline;
+import Engine.IA.AlphaBetaAlgorithm;
 import Engine.Utils;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashMap;
 
 public class Board implements IBoard {
     // region Constants
@@ -24,7 +27,7 @@ public class Board implements IBoard {
     protected short[] _bitCells;
     private final HeuristicPipeline _heuristicPipeline;
     // Last move made by the enemy
-    private IMove _lastEnemyMove = null;
+    private Move _lastEnemyMove = null;
     private int _boardLineSize = 6;
     // endregion
 
@@ -36,10 +39,8 @@ public class Board implements IBoard {
         _heuristicPipeline = heuristicPipeline;
 
         // Init bits to 0
-        for (int i = 0; i < _bitBoard.length; i++) {
-            _bitBoard[i] = 0;
+        for (int i = 0; i < _bitBoard.length; i++)
             _bitCells[i] = EMPTY_CELL;
-        }
     }
 
     public Board(HeuristicPipeline heuristicPipeline) {
@@ -51,7 +52,10 @@ public class Board implements IBoard {
         _bitBoard = board._bitBoard.clone();
         _bitCells = board._bitCells.clone();
         _heuristicPipeline = board._heuristicPipeline;
-        _lastEnemyMove = board._lastEnemyMove;
+        if (board._lastEnemyMove == null)
+            _lastEnemyMove = null;
+        else
+            _lastEnemyMove = board._lastEnemyMove.clone();
     }
     // endregion
 
@@ -75,23 +79,6 @@ public class Board implements IBoard {
                 line |= (short) cell;
             }
             _bitCells[i] = line;
-        }
-    }
-
-    @Override
-    public void setPawnsOnBoard(IPawn[] pawns) {
-        //Iterate over each pawn in the list.
-        //Determine the corresponding bit positions based on the piece type, player color, and whether the cell is occupied or not.
-        //Set the corresponding bits in the bitboard.
-
-        // Init to blank
-        for (int i = 0; i < this._bitBoard.length; i++) {
-            this._bitBoard[i] = 0;
-        }
-
-        // Place pawns
-        for (IPawn pawn : pawns) {
-            this._bitBoard[pawn.getLineNumber()] |= pawn.getLine();
         }
     }
 
@@ -279,8 +266,7 @@ public class Board implements IBoard {
         // Check if the board contains a unicorn for each player
         boolean whiteUnicorn = false;
         boolean blackUnicorn = false;
-        for (int i = 0; i < _bitBoard.length; i++) {
-            int line = _bitBoard[i];
+        for (int line : _bitBoard) {
             for (int j = 0; j < _boardLineSize; j++) {
                 int bits = (line >> (j * PAWN_SIZE)) & 0x7;
                 if ((bits & 0x3) == 0x3) {
@@ -386,12 +372,75 @@ public class Board implements IBoard {
             return false;
         //System.out.println("End position is not occupied");
 
+        // Check if a path exist between the start and end position not occupied using pathfinding
+        short cell = getCellFromPosition(move.getStartPosition());
+        if (cell == 2 || cell == 3) {
+            System.out.println("Checking path between " + move.getStartPosition() + " and " + move.getEndPosition());
+
+            int xDir = move.getEndPosition().getColumn() - move.getStartPosition().getColumn();
+            int yDir = move.getEndPosition().getLine() - move.getStartPosition().getLine();
+
+            int xDirAbs = Math.abs(xDir);
+            int yDirAbs = Math.abs(yDir);
+
+            int xDirSign = (xDirAbs != 0) ? (xDir / xDirAbs) : 0;
+            int yDirSign = (yDirAbs != 0) ? (yDir / yDirAbs) : 0;
+
+            int x = move.getStartPosition().getColumn();
+            int x1 = x;
+            int y = move.getStartPosition().getLine();
+            int y1 = y;
+
+            // Check horizontal then vertical path
+            boolean isHVPathBlocked = false;
+            for (int i = 0; i < xDirAbs; i++) {
+                x += xDirSign;
+                System.out.println("X(HV) - Checking path at " + new Position(y, x));
+                if (getPawnFromPosition(new Position(x, y)).getIsOccupied()) {
+                    isHVPathBlocked = true;
+                }
+            }
+
+            for (int i = 0; i < yDirAbs; i++) {
+                y += yDirSign;
+                System.out.println("Y(HV) - Checking path at " + new Position(y, x));
+                if (getPawnFromPosition(new Position(x, y)).getIsOccupied()) {
+                    isHVPathBlocked = true;
+                }
+            }
+
+            // Check vertical then horizontal path
+            x = x1;
+            y = y1;
+
+            boolean isVHPathBlocked = false;
+            for (int i = 0; i < yDirAbs; i++) {
+                y += yDirSign;
+                System.out.println("Y(VH) - Checking path at " + new Position(y, x));
+                if (getPawnFromPosition(new Position(x, y)).getIsOccupied()) {
+                    isVHPathBlocked = true;
+                }
+            }
+
+            for (int i = 0; i < xDirAbs; i++) {
+                x += xDirSign;
+                System.out.println("X(VH) - Checking path at " + new Position(y, x));
+                if (getPawnFromPosition(new Position(x, y)).getIsOccupied()) {
+                    isVHPathBlocked = true;
+                }
+            }
+            if (isHVPathBlocked && isVHPathBlocked) {
+                System.out.println("Path is blocked");
+                return false;
+            }
+            else
+                System.out.println("Path is not blocked");
+        }
+
         if (_lastEnemyMove != null) {
             //Check if the start position corresponds to the last enemy move.
-            short cell = getCellFromPosition(move.getStartPosition());
             short enemyLastCell = getCellFromPosition(_lastEnemyMove.getEndPosition());
-            if (cell != enemyLastCell)
-                return false;
+            return cell == enemyLastCell;
             //System.out.println("Start position corresponds to the last enemy move");
         }
 
@@ -415,6 +464,7 @@ public class Board implements IBoard {
         for (String pos : poss) {
             Position position = Position.getPositionFromString(pos);
             int cellType = isUnicorn ? (isWhite ? WHITE_UNICORN_CELL : BLACK_UNICORN_CELL) : (isWhite ? WHITE_PALADIN_CELL : BLACK_PALADIN_CELL);
+
             _bitBoard[position.getLine()] |= cellType << (position.getColumn() * PAWN_SIZE);
 
             isUnicorn = false;
@@ -443,7 +493,7 @@ public class Board implements IBoard {
         return _lastEnemyMove;
     }
 
-    public void setLastEnemyMove(IMove lastEnemyMove) {
+    public void setLastEnemyMove(Move lastEnemyMove) {
         _lastEnemyMove = lastEnemyMove;
     }
 
@@ -454,7 +504,7 @@ public class Board implements IBoard {
 
     @Override
     public String toString() {
-        StringBuilder sb = new StringBuilder();
+        /*StringBuilder sb = new StringBuilder();
 
         for (int i = 0, bitBoardLength = _bitBoard.length; i < bitBoardLength; i++) {
             int line = _bitBoard[i];
@@ -471,17 +521,22 @@ public class Board implements IBoard {
                 sb.append("\n");
         }
 
-        return sb.toString();
+        return sb.toString();*/
+        return getString();
     }
 
     public static void main(String[] args) {
         // Create a hex strings representing the board (during a game)
         String[] bitBoard = new String[]{
-                "300000",
-                "101100",
-                "557050",
+                //"300000",
+                //"101100",
+                //"557050",
+                "000000",
+                "000000",
+                "000000",
                 "005000",
-                "500110",
+                //"500110",
+                "000000",
                 "000000"
         };
 
@@ -495,13 +550,21 @@ public class Board implements IBoard {
                 "322132"
         };
 
+        // Create HeuristicPipeline
+        DistanceToEnemy dte = new DistanceToEnemy();
+        HeuristicPipeline heuristicPipeline = new HeuristicPipeline(new HashMap<>() {
+            {
+                put(dte, 1f);
+            }
+        });
+
         // Create fake last enemy move
-        IMove lastEnemyMove = new Move(new Position(0, 0), new Position(0, 0));
+        Move lastEnemyMove = new Move(new Position(0, 0), new Position(0, 0));
 
         // Create a new board
-        Board board = new Board((HeuristicPipeline) null);
+        Board board = new Board(heuristicPipeline);
         board.setCellFromDecString(bitCells);
-        //board.setBoardFromHexStrings(bitBoard);
+        board.setBoardFromHexStrings(bitBoard);
         board.setLastEnemyMove(lastEnemyMove);
 
         // Print the board
@@ -522,21 +585,28 @@ public class Board implements IBoard {
         }
 
         // Test initialisation move
-        System.out.println(board.getInitialisationMove(true));
+        /*System.out.println(board.getInitialisationMove(true));
         System.out.println(board);
         board.applyInitialisationMove(board.getInitialisationMove(true), true);
         System.out.println(board);
         board.applyInitialisationMove(board.getInitialisationMove(false), false);
         System.out.println(board);
+*/
+        // Test AI move
+       /* System.out.println("AI Move with last enemy move : " + lastEnemyMove);
+        AlphaBetaAlgorithm ab = new AlphaBetaAlgorithm(3);
+        Move aiMove = ab.getBestMove(board, true);
+        System.out.println(aiMove);
+        board.applyMoveWithChecks(aiMove);
 
         System.out.println("Moves");
         // Apply a move
         board.setLastEnemyMove(new Move(new Position(0, 0), new Position(0, 1)));
         System.out.println(board.getPawnFromPosition(new Position(0, 0)));
         board.applyMoveWithChecks(new Move(new Position(0, 0), new Position(2, 0)));
-        System.out.println(board);
+        System.out.println(board);*/
         board.setLastEnemyMove(new Move(new Position(0, 1), new Position(0, 0)));
-        board.applyMoveWithChecks(new Move(new Position(2, 3), new Position(2, 1)));
+        board.applyMoveWithChecks(new Move(new Position(2, 3), new Position(3, 1)));
         System.out.println(board);
     }
 }

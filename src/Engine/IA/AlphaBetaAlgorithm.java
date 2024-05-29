@@ -87,7 +87,11 @@ public class AlphaBetaAlgorithm {
             return board.evaluate();
 
         // Initialize the variables
-        EvaluatedMove[] moves = (EvaluatedMove[]) board.getPossibleMoves(isMaximizingPlayer);
+        Move[] temp = board.getPossibleMoves(isMaximizingPlayer);
+        EvaluatedMove[] moves = new EvaluatedMove[temp.length];
+        for (int i = 0; i < temp.length; i++) {
+            moves[i] = new EvaluatedMove(temp[i].clone());
+        }
 
         // If there are no possible moves, return the current best move
         if (moves.length == 0)

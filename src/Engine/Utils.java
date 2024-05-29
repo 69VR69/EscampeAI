@@ -1,9 +1,8 @@
 package Engine;
 
-import Engine.Board.IMove;
-import Engine.Board.IPawn;
-import Engine.Board.Move;
-import Engine.Board.Pawn;
+import Engine.Board.*;
+
+import java.util.ArrayList;
 
 public class Utils {
     public static IPawn NullPawn()
@@ -81,4 +80,5 @@ public class Utils {
     public static int BinaryToInt(String value) {
         return Integer.parseInt(value, 2);
     }
+
 }
