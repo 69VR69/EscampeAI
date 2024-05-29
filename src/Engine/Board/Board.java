@@ -157,7 +157,7 @@ public class Board implements IBoard {
                 // If the pawn is not of the current player, skip it
                 if (pawn._isWhite != isWhite) continue;
 
-                System.out.println(pawn);
+                System.out.println(pawn + " or " + pawn.getPosition().getBoardString());
 
                 // Get the cell type of the pawn
                 short cell = getCellFromPosition(pawn.getPosition());
@@ -175,6 +175,7 @@ public class Board implements IBoard {
 
                 // Get the number of moves the pawn can do by multiplying the cell type by 4 directions
                 int nbMaxMoves = cell * 4;
+                System.out.println("Max moves : " + nbMaxMoves);
 
                 // Get the possible moves of the pawn
                 int lowerLimit = pawn.getColumnNumber();
@@ -182,6 +183,8 @@ public class Board implements IBoard {
                 int negativeUpperLimit = pawn.getLineNumber() - cell;
                 Position pos = new Position(lowerLimit, upperLimit);
                 Position increments = new Position(0, 0);
+
+                System.out.println(" The limits are : \n" + "\tLower limit : " + lowerLimit + "\n\tUpper limit : " + upperLimit + "\n\tNegative upper limit : " + negativeUpperLimit);
                 for (int i = 0; i < nbMaxMoves; i++) {
 
                     // Update the coordinates
@@ -196,6 +199,8 @@ public class Board implements IBoard {
 
                     pos.add(increments);
 
+                    System.out.println("Checking position : " + pos.getBoardString() + " or " + pos);
+
                     // Check if the position is valid
                     if (!pos.isInBounds(_boardLineSize)) continue;
 
@@ -206,7 +211,7 @@ public class Board implements IBoard {
                     // Check if the move is not already in the list
                     Move move = new Move(pawn.getPosition(), pos);
                     if (!moves.contains(move) && IsMoveValid(move)) {
-                        //System.out.println("Checking move : " + move);
+                        //System.out.println("Adding move : " + move + " for pawn at " + pawn + " with cell type " + cell);
                         moves.add(move.clone());
                     }
                 }
@@ -472,7 +477,6 @@ public class Board implements IBoard {
         for (String pos : poss) {
             Position position = Position.getPositionFromString(pos);
             int cellType = isUnicorn ? (isWhite ? WHITE_UNICORN_CELL : BLACK_UNICORN_CELL) : (isWhite ? WHITE_PALADIN_CELL : BLACK_PALADIN_CELL);
-            System.out.println("Applying initialisation move for " + (isWhite ? "white" : "black") + " : " + pos + " with cell type " + Utils.IntToHex(cellType) + "\n on the board : " + this);
             _bitBoard[position.getLine()] |= cellType << (position.getColumn() * PAWN_SIZE);
 
             isUnicorn = false;
