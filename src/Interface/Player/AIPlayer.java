@@ -7,6 +7,7 @@ import Engine.Board.Move;
 import Engine.Heuristics.DistanceToEnemy;
 import Engine.Heuristics.HeuristicPipeline;
 import Engine.Heuristics.IHeuristics;
+import Engine.Heuristics.PawnMobility;
 import Engine.IA.AlphaBetaAlgorithm;
 
 import java.util.HashMap;
@@ -33,7 +34,8 @@ public class AIPlayer implements IJoueur {
 
         HeuristicPipeline heuristics = new HeuristicPipeline(new HashMap<IHeuristics, Float>() {
             {
-                put(new DistanceToEnemy(), 1f);
+                put(new DistanceToEnemy(), 0.5f);
+                put(new PawnMobility(), 0.5f);
             }
         });
 
