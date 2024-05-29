@@ -259,10 +259,10 @@ public class Board implements IBoard {
         };
     }
 
-    public IPawn getPawnFromPosition(Position position) {
+    public Pawn getPawnFromPosition(Position position) {
         // Check if the position is valid
         if (position.getLine() < 0 || position.getLine() >= _bitBoard.length || position.getColumn() < 0 || position.getColumn() >= _boardLineSize)
-            return null;
+            return new Pawn(false,false,true);
 
         // Get the line of the pawn
         int line = _bitBoard[position.getLine()];
@@ -446,16 +446,22 @@ public class Board implements IBoard {
             boolean isHVPathBlocked = false;
             for (int i = 0; i < xDirAbs; i++) {
                 x += xDirSign;
-                System.out.println("X(HV) - Checking path at " + new Position(y, x).getBoardString());
-                if (getPawnFromPosition(new Position(x, y)).getIsOccupied()) {
+                Position pos = new Position(y, x);
+                System.out.println("X(HV) - Checking path at " + pos.getBoardString());
+                Pawn p;
+                if ((p = getPawnFromPosition(pos)).getIsOccupied()) {
+                    System.out.println("Path is blocked by " + p);
                     isHVPathBlocked = true;
                 }
             }
 
             for (int i = 0; i < yDirAbs; i++) {
                 y += yDirSign;
-                System.out.println("Y(HV) - Checking path at " + new Position(y, x).getBoardString());
-                if (getPawnFromPosition(new Position(x, y)).getIsOccupied()) {
+                Position pos = new Position(y, x);
+                System.out.println("Y(HV) - Checking path at " + pos.getBoardString());
+                Pawn p;
+                if ((p = getPawnFromPosition(pos)).getIsOccupied()) {
+                    System.out.println("Path is blocked by " + p);
                     isHVPathBlocked = true;
                 }
             }
@@ -467,19 +473,26 @@ public class Board implements IBoard {
             boolean isVHPathBlocked = false;
             for (int i = 0; i < yDirAbs; i++) {
                 y += yDirSign;
-                System.out.println("Y(VH) - Checking path at " + new Position(y, x).getBoardString());
-                if (getPawnFromPosition(new Position(x, y)).getIsOccupied()) {
+                Position pos = new Position(y, x);
+                System.out.println("Y(VH) - Checking path at " + pos.getBoardString());
+                Pawn p;
+                if ((p = getPawnFromPosition(pos)).getIsOccupied()) {
+                    System.out.println("Path is blocked by " + p);
                     isVHPathBlocked = true;
                 }
             }
 
             for (int i = 0; i < xDirAbs; i++) {
                 x += xDirSign;
-                System.out.println("X(VH) - Checking path at " + new Position(y, x).getBoardString());
-                if (getPawnFromPosition(new Position(x, y)).getIsOccupied()) {
+                Position pos = new Position(y, x);
+                System.out.println("X(VH) - Checking path at " + pos.getBoardString());
+                Pawn p;
+                if ((p = getPawnFromPosition(pos)).getIsOccupied()) {
+                    System.out.println("Path is blocked by " + p);
                     isVHPathBlocked = true;
                 }
             }
+
             if (isHVPathBlocked && isVHPathBlocked) {
                 System.out.println("Path is blocked");
                 return false;

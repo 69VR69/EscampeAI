@@ -79,7 +79,7 @@ public class AIPlayer implements IJoueur {
             board.applyInitialisationMove(moveString, isWhite);
         } else {
             Move move = alphaBetaAlgorithm.getBestMove(board, isWhite);
-            board.applyMoveWithChecks(move);
+            board.applyMove(move, false);
             moveString = (Utils.IsNothingMove(move)) ? "E" :  move.toString();
             System.out.println("Move : " + move.getStartPosition() + " -> " + move.getEndPosition());
         }
@@ -115,6 +115,7 @@ public class AIPlayer implements IJoueur {
     public void mouvementEnnemi(String coup) {
         if (coup.equals("E") || coup.equals("PASSE")) {
             System.out.println("The opponent passed his turn");
+            board.setLastEnemyMove(null);
             return;
         }
 
