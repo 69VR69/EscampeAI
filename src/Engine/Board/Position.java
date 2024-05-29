@@ -46,6 +46,11 @@ public class Position implements IPosition {
 	public boolean isInBounds(int size) {
 		return _line >= 0 && _line < size && _column >= 0 && _column < size;
 	}
+
+	@Override
+	public Position clone() {
+		return new Position(this);
+	}
 	// endregion
 	
     // region Getters & Setters

@@ -157,7 +157,7 @@ public class Board implements IBoard {
                 // If the pawn is not of the current player, skip it
                 if (pawn._isWhite != isWhite) continue;
 
-                System.out.println(pawn + " or " + pawn.getPosition().getBoardString());
+                //System.out.println(pawn + " or " + pawn.getPosition().getBoardString());
 
                 // Get the cell type of the pawn
                 short cell = getCellFromPosition(pawn.getPosition());
@@ -173,33 +173,31 @@ public class Board implements IBoard {
                     if (cell != enemyLastCell) continue;
                 }
 
-                // Get the number of moves the pawn can do by multiplying the cell type by 4 directions
-                int nbMaxMoves = cell * 4;
-                System.out.println("Max moves : " + nbMaxMoves);
-
                 // Get the possible moves of the pawn
-                int lowerLimit = pawn.getColumnNumber();
-                int upperLimit = pawn.getLineNumber() + cell;
-                int negativeUpperLimit = pawn.getLineNumber() - cell;
-                Position pos = new Position(lowerLimit, upperLimit);
-                Position increments = new Position(0, 0);
+                Position pawnPos = pawn.getPosition();
+                Position[] posToCheck;
+                switch (cell) {
+                    case 1: // Simple cell
+                        posToCheck = getPosToCheckFor1(pawnPos);
+                        break;
+                    case 2: // Double cell
+                        posToCheck = getPosToCheckFor2(pawnPos);
+                        break;
 
-                System.out.println(" The limits are : \n" + "\tLower limit : " + lowerLimit + "\n\tUpper limit : " + upperLimit + "\n\tNegative upper limit : " + negativeUpperLimit);
-                for (int i = 0; i < nbMaxMoves; i++) {
+                    case 3: // Triple cell
+                        posToCheck = GetPosToCheckFor3(pawnPos);
+                        break;
 
-                    // Update the coordinates
-                    if (pos.equals(new Position(lowerLimit, upperLimit)))
-                        increments.setTo(1, -1);
-                    else if (pos.equals(new Position(upperLimit, lowerLimit)))
-                        increments.setTo(-1, -1);
-                    else if (pos.equals(new Position(lowerLimit, negativeUpperLimit)))
-                        increments.setTo(-1, 1);
-                    else if (pos.equals(new Position(negativeUpperLimit, lowerLimit)))
-                        increments.setTo(1, 1);
+                    default:
+                        posToCheck = new Position[0];
+                        break;
+                }
 
-                    pos.add(increments);
+                //System.out.println("Possible positions to check : " + Arrays.toString(posToCheck));
 
-                    System.out.println("Checking position : " + pos.getBoardString() + " or " + pos);
+                for (Position pos : posToCheck) {
+
+                    //System.out.println("Checking position : " + pos.getBoardString() + " or " + pos);
 
                     // Check if the position is valid
                     if (!pos.isInBounds(_boardLineSize)) continue;
@@ -211,7 +209,7 @@ public class Board implements IBoard {
                     // Check if the move is not already in the list
                     Move move = new Move(pawn.getPosition(), pos);
                     if (!moves.contains(move) && IsMoveValid(move)) {
-                        //System.out.println("Adding move : " + move + " for pawn at " + pawn + " with cell type " + cell);
+                        System.out.println("Adding move : " + move + " for pawn at " + pawn + " with cell type " + cell);
                         moves.add(move.clone());
                     }
                 }
@@ -220,6 +218,45 @@ public class Board implements IBoard {
         if (!moves.isEmpty())
             System.out.println("Possible moves : " + Arrays.toString(moves.toArray()));
         return moves.toArray(new Move[0]);
+    }
+
+    private static Position[] getPosToCheckFor1(Position pawnPos) {
+        return new Position[]{
+                Utils.AddPosition(pawnPos, new Position(0, 1)),
+                Utils.AddPosition(pawnPos, new Position(1, 0)),
+                Utils.AddPosition(pawnPos, new Position(0, -1)),
+                Utils.AddPosition(pawnPos, new Position(-1, 0))
+        };
+    }
+
+    private static Position[] getPosToCheckFor2(Position pawnPos) {
+        return new Position[]{
+                Utils.AddPosition(pawnPos, new Position(0, 2)),
+                Utils.AddPosition(pawnPos, new Position(1, 1)),
+                Utils.AddPosition(pawnPos, new Position(2, 0)),
+                Utils.AddPosition(pawnPos, new Position(1, -1)),
+                Utils.AddPosition(pawnPos, new Position(0, -2)),
+                Utils.AddPosition(pawnPos, new Position(-1, -1)),
+                Utils.AddPosition(pawnPos, new Position(-2, 0)),
+                Utils.AddPosition(pawnPos, new Position(-1, 1))
+        };
+    }
+
+    private static Position[] GetPosToCheckFor3(Position pawnPos) {
+        return new Position[]{
+                Utils.AddPosition(pawnPos, new Position(0, 3)),
+                Utils.AddPosition(pawnPos, new Position(1, 2)),
+                Utils.AddPosition(pawnPos, new Position(2, 1)),
+                Utils.AddPosition(pawnPos, new Position(3, 0)),
+                Utils.AddPosition(pawnPos, new Position(2, -1)),
+                Utils.AddPosition(pawnPos, new Position(1, -2)),
+                Utils.AddPosition(pawnPos, new Position(0, -3)),
+                Utils.AddPosition(pawnPos, new Position(-1, -2)),
+                Utils.AddPosition(pawnPos, new Position(-2, -1)),
+                Utils.AddPosition(pawnPos, new Position(-3, 0)),
+                Utils.AddPosition(pawnPos, new Position(-2, 1)),
+                Utils.AddPosition(pawnPos, new Position(-1, 2))
+        };
     }
 
     public IPawn getPawnFromPosition(Position position) {
@@ -319,26 +356,27 @@ public class Board implements IBoard {
     @Override
     public void applyMove(IMove move, boolean bypassChecks) {
         //Apply the move to the board.
-        if (bypassChecks || IsMoveValid(move)) {
-            //System.out.println("currently applying move : " + move);
-            int startLine = this._bitBoard[move.getStartPosition().getLine()];
-            int endLine = this._bitBoard[move.getEndPosition().getLine()];
-            int startColumn = move.getStartPosition().getColumn();
-            int endColumn = move.getEndPosition().getColumn();
-            int startBits = (startLine >> (startColumn * PAWN_SIZE)) & 0x7;
-            int endBits = (endLine >> (endColumn * PAWN_SIZE)) & 0x7;
+        if (!bypassChecks && !IsMoveValid(move)) return;
+
+        //System.out.println("currently applying move : " + move);
+        int startLine = this._bitBoard[move.getStartPosition().getLine()];
+        int endLine = this._bitBoard[move.getEndPosition().getLine()];
+        int startColumn = move.getStartPosition().getColumn();
+        int endColumn = move.getEndPosition().getColumn();
+        int startBits = (startLine >> (startColumn * PAWN_SIZE)) & 0x7;
+        int endBits = (endLine >> (endColumn * PAWN_SIZE)) & 0x7;
 
 
-            startLine &= ~(0x7 << (startColumn * PAWN_SIZE));
-            endLine &= ~(0x7 << (endColumn * PAWN_SIZE));
+        startLine &= ~(0x7 << (startColumn * PAWN_SIZE));
+        endLine &= ~(0x7 << (endColumn * PAWN_SIZE));
 
 
-            startLine |= endBits << (startColumn * PAWN_SIZE);
-            endLine |= startBits << (endColumn * PAWN_SIZE);
+        startLine |= endBits << (startColumn * PAWN_SIZE);
+        endLine |= startBits << (endColumn * PAWN_SIZE);
 
-            this._bitBoard[move.getStartPosition().getLine()] = startLine;
-            this._bitBoard[move.getEndPosition().getLine()] = endLine;
-        }
+        this._bitBoard[move.getStartPosition().getLine()] = startLine;
+        this._bitBoard[move.getEndPosition().getLine()] = endLine;
+
     }
 
     @Override
@@ -385,7 +423,7 @@ public class Board implements IBoard {
         // Check if a path exist between the start and end position not occupied using pathfinding
         short cell = getCellFromPosition(move.getStartPosition());
         if (cell == 2 || cell == 3) {
-            //System.out.println("Checking path between " + move.getStartPosition().getBoardString() + " and " + move.getEndPosition().getBoardString());
+            System.out.println("Checking path between " + move.getStartPosition().getBoardString() + " and " + move.getEndPosition().getBoardString());
 
             int xDir = move.getEndPosition().getColumn() - move.getStartPosition().getColumn();
             int yDir = move.getEndPosition().getLine() - move.getStartPosition().getLine();
@@ -408,7 +446,7 @@ public class Board implements IBoard {
             boolean isHVPathBlocked = false;
             for (int i = 0; i < xDirAbs; i++) {
                 x += xDirSign;
-                //System.out.println("X(HV) - Checking path at " + new Position(y, x).getBoardString());
+                System.out.println("X(HV) - Checking path at " + new Position(y, x).getBoardString());
                 if (getPawnFromPosition(new Position(x, y)).getIsOccupied()) {
                     isHVPathBlocked = true;
                 }
@@ -416,7 +454,7 @@ public class Board implements IBoard {
 
             for (int i = 0; i < yDirAbs; i++) {
                 y += yDirSign;
-                //System.out.println("Y(HV) - Checking path at " + new Position(y, x).getBoardString());
+                System.out.println("Y(HV) - Checking path at " + new Position(y, x).getBoardString());
                 if (getPawnFromPosition(new Position(x, y)).getIsOccupied()) {
                     isHVPathBlocked = true;
                 }
@@ -429,7 +467,7 @@ public class Board implements IBoard {
             boolean isVHPathBlocked = false;
             for (int i = 0; i < yDirAbs; i++) {
                 y += yDirSign;
-                //System.out.println("Y(VH) - Checking path at " + new Position(y, x).getBoardString());
+                System.out.println("Y(VH) - Checking path at " + new Position(y, x).getBoardString());
                 if (getPawnFromPosition(new Position(x, y)).getIsOccupied()) {
                     isVHPathBlocked = true;
                 }
@@ -437,18 +475,18 @@ public class Board implements IBoard {
 
             for (int i = 0; i < xDirAbs; i++) {
                 x += xDirSign;
-                //System.out.println("X(VH) - Checking path at " + new Position(y, x).getBoardString());
+                System.out.println("X(VH) - Checking path at " + new Position(y, x).getBoardString());
                 if (getPawnFromPosition(new Position(x, y)).getIsOccupied()) {
                     isVHPathBlocked = true;
                 }
             }
             if (isHVPathBlocked && isVHPathBlocked) {
-                //System.out.println("Path is blocked");
+                System.out.println("Path is blocked");
                 return false;
-            }
-            //else
-            //System.out.println("Path is not blocked");
+            } else
+                System.out.println("Path is not blocked");
         }
+
 
         if (_lastEnemyMove != null) {
             //Check if the start position corresponds to the last enemy move.

@@ -2,6 +2,7 @@ package Engine;
 
 import Engine.Board.*;
 
+import java.lang.reflect.Array;
 import java.util.ArrayList;
 
 public class Utils {
@@ -29,6 +30,14 @@ public class Utils {
     }
 
     private static Move _nothingMove;
+
+    /**
+     * Check if the move is a nothing move
+     * @param move the move to check
+     */
+    public static boolean IsNothingMove(IMove move) {
+        return move.getStartPosition().equals(_nothingMove.getStartPosition()) && move.getEndPosition().equals(_nothingMove.getEndPosition());
+    }
 
     /**
      * Get the inverse of a move
@@ -80,5 +89,33 @@ public class Utils {
         return Integer.parseInt(value, 2);
     }
 
+    /**
+     * Convert a string into a position
+     * @param pos the string to convert
+     * @param offset the offset to apply
+     * @return the position
+     */
+    public static Position AddPosition(Position pos, Position offset) {
+        Position p = pos.clone();
+        p.add(offset);
+        return p;
+    }
 
+    /**
+     * Concatenate two arrays
+     * @param a the first array
+     * @param b the second array
+     * @return the concatenated array
+     */
+    public static  <T> T[] concatenate(T[] a, T[] b) {
+        int aLen = a.length;
+        int bLen = b.length;
+
+        @SuppressWarnings("unchecked")
+        T[] c = (T[]) Array.newInstance(a.getClass().getComponentType(), aLen + bLen);
+        System.arraycopy(a, 0, c, 0, aLen);
+        System.arraycopy(b, 0, c, aLen, bLen);
+
+        return c;
+    }
 }

@@ -9,6 +9,7 @@ import Engine.Heuristics.HeuristicPipeline;
 import Engine.Heuristics.IHeuristics;
 import Engine.Heuristics.PawnMobility;
 import Engine.IA.AlphaBetaAlgorithm;
+import Engine.Utils;
 
 import java.util.HashMap;
 
@@ -75,11 +76,12 @@ public class AIPlayer implements IJoueur {
         String moveString;
         if (nbMoves < 2) {
             moveString = board.getInitialisationMove(enemyStartFromTop);
-            board.applyInitialisationMove(moveString,isWhite);
+            board.applyInitialisationMove(moveString, isWhite);
         } else {
             Move move = alphaBetaAlgorithm.getBestMove(board, isWhite);
             board.applyMoveWithChecks(move);
-            moveString = move.toString();
+            moveString = (Utils.IsNothingMove(move)) ? "E" :  move.toString();
+            System.out.println("Move : " + move.getStartPosition() + " -> " + move.getEndPosition());
         }
 
         nbMoves++;
@@ -111,7 +113,7 @@ public class AIPlayer implements IJoueur {
      */
     @Override
     public void mouvementEnnemi(String coup) {
-        if(coup.equals("PASSE")) {
+        if (coup.equals("E") || coup.equals("PASSE")) {
             System.out.println("The opponent passed his turn");
             return;
         }

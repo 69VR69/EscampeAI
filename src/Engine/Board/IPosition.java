@@ -32,4 +32,9 @@ public interface IPosition {
      * @param size the size of the board
      */
     boolean isInBounds(int size);
+
+    /**
+     * Clone the position
+     */
+    Position clone();
 }
