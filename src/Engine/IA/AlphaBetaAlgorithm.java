@@ -60,6 +60,7 @@ public class AlphaBetaAlgorithm {
                 alpha = value;
                 // Update the best move
                 bestMove = move;
+                System.out.println("Best move : " + bestMove);
             }
         }
 
@@ -96,8 +97,6 @@ public class AlphaBetaAlgorithm {
         // If there are no possible moves, return the current best move
         if (moves.length == 0)
             return board.evaluate();
-
-        // If the current player is maximizing
 
         // Return the best move
         return isMaximizingPlayer ?

@@ -130,4 +130,10 @@ public interface IBoard
      * @return the last enemy move
      */
     boolean IsMoveValid(EvaluatedMove move);
+
+    /**
+     * Get the last enemy move
+     * @return the last enemy move
+     */
+    Move getLastEnemyMove();
 }

@@ -75,7 +75,7 @@ public class AIPlayer implements IJoueur {
         String moveString;
         if (nbMoves < 2) {
             moveString = board.getInitialisationMove(enemyStartFromTop);
-            board.applyInitialisationMove(moveString,enemyStartFromTop);
+            board.applyInitialisationMove(moveString,isWhite);
         } else {
             Move move = alphaBetaAlgorithm.getBestMove(board, isWhite);
             board.applyMoveWithChecks(move);
@@ -83,7 +83,7 @@ public class AIPlayer implements IJoueur {
         }
 
         nbMoves++;
-        System.out.println(board + "\n^-> After move : " + moveString + "\n");
+        System.out.println(board + "\n^-> After move : " + moveString + " and last enemy move : " + board.getLastEnemyMove() + "\n");
 
         return moveString;
     }
@@ -118,7 +118,7 @@ public class AIPlayer implements IJoueur {
 
         if (nbMoves < 2) {
             enemyStartFromTop = isStartingFromTop(coup);
-            board.applyInitialisationMove(coup, enemyStartFromTop);
+            board.applyInitialisationMove(coup, !isWhite);
         } else {
             Move enemyMove = new Move(coup);
             board.applyMoveWithChecks(enemyMove);
