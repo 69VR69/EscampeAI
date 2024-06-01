@@ -98,9 +98,9 @@ public class AIPlayer implements IJoueur {
     @Override
     public void declareLeVainqueur(int colour) {
         if (colour == getNumJoueur())
-            System.out.println("I won !");
+            System.out.println("I won, so " + binoName() + " won !");
         else
-            System.out.println("I lost !");
+            System.out.println("I lost, so " + binoName() + " lost !");
     }
 
     /**

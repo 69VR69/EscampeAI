@@ -148,7 +148,7 @@ public class Board implements IBoard {
             // Iterate of each pawns in the line
             for (int columnNumber = 0; columnNumber < _boardLineSize; columnNumber++) {
                 // Extract the PAWN_SIZE bits from the line
-                int bits = (line >> (columnNumber * PAWN_SIZE)) & 0x7;
+                int bits = (line >> (columnNumber * PAWN_SIZE)) & 0xF;
                 Pawn pawn = new Pawn(bits, lineNumber, columnNumber);
 
                 // If the pawn is not occupied, skip it
@@ -204,12 +204,13 @@ public class Board implements IBoard {
 
                     // Check if the cell at the new position is empty from bitboard
                     IPawn cellPawn = getPawnFromPosition(pos);
-                    if (cellPawn == null || cellPawn.getIsOccupied()) continue;
+                    if (cellPawn.getIsOccupied()) continue;
+                    //System.out.println(cellPawn + " is not occupied at pos " + pos.getBoardString());
 
                     // Check if the move is not already in the list
                     Move move = new Move(pawn.getPosition(), pos);
                     if (!moves.contains(move) && IsMoveValid(move)) {
-                        System.out.println("Adding move : " + move + " for pawn at " + pawn + " with cell type " + cell);
+                        //System.out.println("Adding move : " + move + " for pawn at " + pawn + " with cell type " + cell);
                         moves.add(move.clone());
                     }
                 }
@@ -262,13 +263,13 @@ public class Board implements IBoard {
     public Pawn getPawnFromPosition(Position position) {
         // Check if the position is valid
         if (position.getLine() < 0 || position.getLine() >= _bitBoard.length || position.getColumn() < 0 || position.getColumn() >= _boardLineSize)
-            return new Pawn(false,false,true);
+            return new Pawn(false, false, true);
 
         // Get the line of the pawn
         int line = _bitBoard[position.getLine()];
 
         // Get the bits of the pawn
-        int bits = (line >> (position.getColumn() * PAWN_SIZE)) & 0x7;
+        int bits = (line >> (position.getColumn() * PAWN_SIZE)) & 0xF;
 
         return new Pawn(bits, position.getLine(), position.getColumn());
     }
@@ -311,7 +312,7 @@ public class Board implements IBoard {
         boolean blackUnicorn = false;
         for (int line : _bitBoard) {
             for (int j = 0; j < _boardLineSize; j++) {
-                int bits = (line >> (j * PAWN_SIZE)) & 0x7;
+                int bits = (line >> (j * PAWN_SIZE)) & 0xF;
                 if ((bits & 0x3) == 0x3) {
                     if ((bits & 0x4) == 0x4) {
                         whiteUnicorn = true;
@@ -329,7 +330,7 @@ public class Board implements IBoard {
         for (int i = 0; i < _bitBoard.length; i++) {
             int line = _bitBoard[i];
             for (int j = 0; j < _boardLineSize; j++) {
-                int bits = (line >> (j * PAWN_SIZE)) & 0x7;
+                int bits = (line >> (j * PAWN_SIZE)) & 0xF;
                 if ((bits & 0x1) == 0x1) {
                     if (bits == 0x1) {
                         whiteBlocked = false;
@@ -358,24 +359,71 @@ public class Board implements IBoard {
         //Apply the move to the board.
         if (!bypassChecks && !IsMoveValid(move)) return;
 
-        //System.out.println("currently applying move : " + move);
-        int startLine = this._bitBoard[move.getStartPosition().getLine()];
-        int endLine = this._bitBoard[move.getEndPosition().getLine()];
+        int startBinaryLine = this._bitBoard[move.getStartPosition().getLine()];
         int startColumn = move.getStartPosition().getColumn();
+        int endBinaryLine = this._bitBoard[move.getEndPosition().getLine()];
         int endColumn = move.getEndPosition().getColumn();
-        int startBits = (startLine >> (startColumn * PAWN_SIZE)) & 0x7;
-        int endBits = (endLine >> (endColumn * PAWN_SIZE)) & 0x7;
+
+        System.out.println("currently applying move : " + move + " on startBinaryLine " + Utils.IntToHex(startBinaryLine) + " and endBinaryLine " + Utils.IntToHex(endBinaryLine));// + " to the board " + this);
+
+        int extractMask = (1 << PAWN_SIZE) - 1;
+
+        if (move.isInline()) {
+            // Extract the bits of the start and end position
+            int block1 = (startBinaryLine >> (startColumn * PAWN_SIZE)) & extractMask;
+            int block2 = (startBinaryLine >> (endColumn * PAWN_SIZE)) & extractMask;
+
+            // Clear the bits of the start and end position
+            startBinaryLine &= ~(extractMask << (startColumn * PAWN_SIZE));
+            startBinaryLine &= ~(extractMask << (endColumn * PAWN_SIZE));
+
+            // Swap the bits of the start and end position
+            startBinaryLine |= (block2 << (endColumn * PAWN_SIZE));
+            startBinaryLine |= (block1 << (startColumn * PAWN_SIZE));
+
+            // Update the bitboard
+            this._bitBoard[move.getStartPosition().getLine()] = startBinaryLine;
+
+        } else {
+        // Extract the bits of the start and end position
+        int block1 = (startBinaryLine >> (startColumn * PAWN_SIZE)) & extractMask;
+        int block2 = (endBinaryLine >> (endColumn * PAWN_SIZE)) & extractMask;
+
+        // Clear the bits of the start and end position
+        startBinaryLine &= ~(extractMask << (startColumn * PAWN_SIZE));
+        endBinaryLine &= ~(extractMask << (endColumn * PAWN_SIZE));
+            // Swap the bits of the start and end position
+            startBinaryLine |= (block2 << (startColumn * PAWN_SIZE));
+            endBinaryLine |= (block1 << (endColumn * PAWN_SIZE));
+
+            this._bitBoard[move.getStartPosition().getLine()] = startBinaryLine;
+            this._bitBoard[move.getEndPosition().getLine()] = endBinaryLine;
+        }
+        System.out.println("after applying move : " + move + " with startBinaryLine " + Utils.IntToHex(startBinaryLine) + " and endBinaryLine " + Utils.IntToHex(endBinaryLine) + " to the board \n" + this);
 
 
-        startLine &= ~(0x7 << (startColumn * PAWN_SIZE));
-        endLine &= ~(0x7 << (endColumn * PAWN_SIZE));
+        // count the verify that there is still 6 pawns ( 1 unicorn + 5 paladins) of each player
+        int whiteUnicornCount = 0;
+        int blackUnicornCount = 0;
+        int whitePaladinCount = 0;
+        int blackPaladinCount = 0;
+        for (int line : _bitBoard) {
+            for (int j = 0; j < _boardLineSize; j++) {
+                int bits = (line >> (j * PAWN_SIZE)) & 0xF;
 
-
-        startLine |= endBits << (startColumn * PAWN_SIZE);
-        endLine |= startBits << (endColumn * PAWN_SIZE);
-
-        this._bitBoard[move.getStartPosition().getLine()] = startLine;
-        this._bitBoard[move.getEndPosition().getLine()] = endLine;
+                if (BLACK_PALADIN_CELL == bits)
+                    blackPaladinCount++;
+                else if (BLACK_UNICORN_CELL == bits)
+                    blackUnicornCount++;
+                else if (WHITE_PALADIN_CELL == bits)
+                    whitePaladinCount++;
+                else if (WHITE_UNICORN_CELL == bits)
+                    whiteUnicornCount++;
+            }
+        }
+        System.out.println("White unicorn count : " + whiteUnicornCount + " Black unicorn count : " + blackUnicornCount + " White paladin count : " + whitePaladinCount + " Black paladin count : " + blackPaladinCount);
+        if (whiteUnicornCount != 1 || blackUnicornCount != 1 || whitePaladinCount != 5 || blackPaladinCount != 5)
+            throw new RuntimeException("Invalid number of pawns");
 
     }
 
@@ -394,6 +442,8 @@ public class Board implements IBoard {
     }
 
     public boolean IsMoveValid(IMove move) {
+        final boolean DEBUG = false; // Set to true to enable debug messages
+
         //Check if the start position is valid.
         if (move.getStartPosition().getLine() < 0 || move.getStartPosition().getLine() >= _bitBoard.length || move.getStartPosition().getColumn() < 0 || move.getStartPosition().getColumn() >= _boardLineSize)
             return false;
@@ -407,7 +457,7 @@ public class Board implements IBoard {
         //Check if the start position is occupied.
         int startLine = this._bitBoard[move.getStartPosition().getLine()];
         int startColumn = move.getStartPosition().getColumn();
-        int startBits = (startLine >> (startColumn * PAWN_SIZE)) & 0x7;
+        int startBits = (startLine >> (startColumn * PAWN_SIZE)) & 0xF;
         if ((startBits & 0x1) == 0)
             return false;
         //System.out.println("Start position is occupied");
@@ -415,7 +465,7 @@ public class Board implements IBoard {
         //Check if the end position is not occupied.
         int endLine = this._bitBoard[move.getEndPosition().getLine()];
         int endColumn = move.getEndPosition().getColumn();
-        int endBits = (endLine >> (endColumn * PAWN_SIZE)) & 0x7;
+        int endBits = (endLine >> (endColumn * PAWN_SIZE)) & 0xF;
         if ((endBits & 0x1) == 1)
             return false;
         //System.out.println("End position is not occupied");
@@ -423,7 +473,8 @@ public class Board implements IBoard {
         // Check if a path exist between the start and end position not occupied using pathfinding
         short cell = getCellFromPosition(move.getStartPosition());
         if (cell == 2 || cell == 3) {
-            System.out.println("Checking path between " + move.getStartPosition().getBoardString() + " and " + move.getEndPosition().getBoardString());
+            if (DEBUG)
+                System.out.println("Checking path between " + move.getStartPosition().getBoardString() + " and " + move.getEndPosition().getBoardString());
 
             int xDir = move.getEndPosition().getColumn() - move.getStartPosition().getColumn();
             int yDir = move.getEndPosition().getLine() - move.getStartPosition().getLine();
@@ -447,10 +498,12 @@ public class Board implements IBoard {
             for (int i = 0; i < xDirAbs; i++) {
                 x += xDirSign;
                 Position pos = new Position(y, x);
-                System.out.println("X(HV) - Checking path at " + pos.getBoardString());
+                if (DEBUG)
+                    System.out.println("X(HV) - Checking path at " + pos.getBoardString());
                 Pawn p;
                 if ((p = getPawnFromPosition(pos)).getIsOccupied()) {
-                    System.out.println("Path is blocked by " + p);
+                    if (DEBUG)
+                        System.out.println("Path is blocked by " + p);
                     isHVPathBlocked = true;
                 }
             }
@@ -458,10 +511,12 @@ public class Board implements IBoard {
             for (int i = 0; i < yDirAbs; i++) {
                 y += yDirSign;
                 Position pos = new Position(y, x);
-                System.out.println("Y(HV) - Checking path at " + pos.getBoardString());
+                if (DEBUG)
+                    System.out.println("Y(HV) - Checking path at " + pos.getBoardString());
                 Pawn p;
                 if ((p = getPawnFromPosition(pos)).getIsOccupied()) {
-                    System.out.println("Path is blocked by " + p);
+                    if (DEBUG)
+                        System.out.println("Path is blocked by " + p);
                     isHVPathBlocked = true;
                 }
             }
@@ -474,10 +529,12 @@ public class Board implements IBoard {
             for (int i = 0; i < yDirAbs; i++) {
                 y += yDirSign;
                 Position pos = new Position(y, x);
-                System.out.println("Y(VH) - Checking path at " + pos.getBoardString());
+                if (DEBUG)
+                    System.out.println("Y(VH) - Checking path at " + pos.getBoardString());
                 Pawn p;
                 if ((p = getPawnFromPosition(pos)).getIsOccupied()) {
-                    System.out.println("Path is blocked by " + p);
+                    if (DEBUG)
+                        System.out.println("Path is blocked by " + p);
                     isVHPathBlocked = true;
                 }
             }
@@ -485,19 +542,24 @@ public class Board implements IBoard {
             for (int i = 0; i < xDirAbs; i++) {
                 x += xDirSign;
                 Position pos = new Position(y, x);
-                System.out.println("X(VH) - Checking path at " + pos.getBoardString());
+                if (DEBUG)
+                    System.out.println("X(VH) - Checking path at " + pos.getBoardString());
                 Pawn p;
                 if ((p = getPawnFromPosition(pos)).getIsOccupied()) {
-                    System.out.println("Path is blocked by " + p);
+                    if (DEBUG)
+                        System.out.println("Path is blocked by " + p);
                     isVHPathBlocked = true;
                 }
             }
 
             if (isHVPathBlocked && isVHPathBlocked) {
-                System.out.println("Path is blocked");
+                if (DEBUG)
+                    System.out.println("Path is blocked");
                 return false;
-            } else
-                System.out.println("Path is not blocked");
+            } else {
+                if (DEBUG)
+                    System.out.println("Path is not blocked");
+            }
         }
 
 
@@ -539,7 +601,7 @@ public class Board implements IBoard {
         for (int i = 0; i < _bitBoard.length; i++) {
             int line = _bitBoard[i];
             for (int j = 0; j < _boardLineSize; j++) {
-                int bits = (line >> (j * PAWN_SIZE)) & 0x7;
+                int bits = (line >> (j * PAWN_SIZE)) & 0xF;
                 if ((bits & 0x3) == 0x3) {
                     return new Pawn(bits, i, j);
                 }

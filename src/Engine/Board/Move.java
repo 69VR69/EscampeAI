@@ -53,6 +53,11 @@ public class Move implements IMove, Cloneable {
     public Position getEndPosition() {
         return _endPosition;
     }
+
+    @Override
+    public boolean isInline() {
+        return _startPosition.getLine() == _endPosition.getLine();
+    }
     // endregion
 
     @Override

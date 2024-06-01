@@ -17,4 +17,9 @@ public interface IMove {
      * Get the end position of the move
      */
     Position getEndPosition();
+
+    /**
+     * Get if the move is inline
+     */
+    boolean isInline();
 }
