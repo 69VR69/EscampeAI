@@ -373,25 +373,33 @@ public class Board implements IBoard {
             int block1 = (startBinaryLine >> (startColumn * PAWN_SIZE)) & extractMask;
             int block2 = (startBinaryLine >> (endColumn * PAWN_SIZE)) & extractMask;
 
+            System.out.println("block1 : " + Utils.IntToBinary(block1, 4) + " block2 : " + Utils.IntToBinary(block2,4));
+            System.out.println(" get from (" + startColumn + " to " + endColumn);
+
             // Clear the bits of the start and end position
             startBinaryLine &= ~(extractMask << (startColumn * PAWN_SIZE));
             startBinaryLine &= ~(extractMask << (endColumn * PAWN_SIZE));
 
+            System.out.println("startBinaryLine after clearing : " + Utils.IntToHex(startBinaryLine) + " or " + Utils.IntToBinary(startBinaryLine));
+
             // Swap the bits of the start and end position
-            startBinaryLine |= (block2 << (endColumn * PAWN_SIZE));
-            startBinaryLine |= (block1 << (startColumn * PAWN_SIZE));
+            startBinaryLine |= (block2 << (startColumn * PAWN_SIZE));
+            System.out.println("startBinaryLine 1 after swapping : " + Utils.IntToHex(startBinaryLine) + " or " + Utils.IntToBinary(startBinaryLine));
+
+            startBinaryLine |= (block1 << (endColumn * PAWN_SIZE));
+            System.out.println("startBinaryLine 2 after swapping : " + Utils.IntToHex(startBinaryLine) + " or " + Utils.IntToBinary(startBinaryLine));
 
             // Update the bitboard
             this._bitBoard[move.getStartPosition().getLine()] = startBinaryLine;
 
         } else {
-        // Extract the bits of the start and end position
-        int block1 = (startBinaryLine >> (startColumn * PAWN_SIZE)) & extractMask;
-        int block2 = (endBinaryLine >> (endColumn * PAWN_SIZE)) & extractMask;
+            // Extract the bits of the start and end position
+            int block1 = (startBinaryLine >> (startColumn * PAWN_SIZE)) & extractMask;
+            int block2 = (endBinaryLine >> (endColumn * PAWN_SIZE)) & extractMask;
 
-        // Clear the bits of the start and end position
-        startBinaryLine &= ~(extractMask << (startColumn * PAWN_SIZE));
-        endBinaryLine &= ~(extractMask << (endColumn * PAWN_SIZE));
+            // Clear the bits of the start and end position
+            startBinaryLine &= ~(extractMask << (startColumn * PAWN_SIZE));
+            endBinaryLine &= ~(extractMask << (endColumn * PAWN_SIZE));
             // Swap the bits of the start and end position
             startBinaryLine |= (block2 << (startColumn * PAWN_SIZE));
             endBinaryLine |= (block1 << (endColumn * PAWN_SIZE));

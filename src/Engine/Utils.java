@@ -76,7 +76,17 @@ public class Utils {
      * @value the int to convert
      */
     public static String IntToBinary(int value) {
-        return Integer.toBinaryString(value);
+        return IntToBinary(value, 24);
+    }
+    public static String IntToBinary(int value, int length) {
+        // Create a mask
+        int mask = 1 << (length - 1);
+        StringBuilder result = new StringBuilder();
+        for (int i = 0; i < length; i++) {
+            result.append((value & mask) != 0 ? '1' : '0');
+            value <<= 1;
+        }
+        return result.toString();
     }
 
     /**
