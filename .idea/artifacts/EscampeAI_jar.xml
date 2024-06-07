@@ -1,0 +1,8 @@
+<component name="ArtifactManager">
+  <artifact type="jar" name="EscampeAI:jar">
+    <output-path>$PROJECT_DIR$/out/artifacts/EscampeAI_jar</output-path>
+    <root id="archive" name="EscampeAI.jar">
+      <element id="module-output" name="EscampeAI" />
+    </root>
+  </artifact>
+</component>
